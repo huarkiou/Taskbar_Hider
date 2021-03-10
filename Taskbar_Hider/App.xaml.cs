@@ -12,26 +12,24 @@ namespace Taskbar_Hider
         private void Application_Startup(object sender, StartupEventArgs e)
         {
 
-            bool runone;
-            var mutex = new System.Threading.Mutex(true, "Global\\" + PROGRAM_NAME, out runone);
-            if(runone)
+            var mutex = new System.Threading.Mutex(true, "Global\\" + PROGRAM_NAME, out bool runone);
+            if (runone)
             {
                 mutex.ReleaseMutex();
                 ConfigHelper.Load();
                 wnd = new MainWindow();
-                //wnd.Height = 0;
-                //wnd.Width = 0;
                 wnd.ShowActivated = false;
                 wnd.Show();
                 wnd.Hide();
-                //wnd.Height = 330;
-                //wnd.Width = 440;
-                //wnd.MinHeight = 300;
-                //wnd.MinWidth = 400;
             }
             else
             {
                 MessageBox.Show("已启动一个"+ PROGRAM_NAME + "实例,不必重复启动。");
+                if (wnd != null)
+                {
+                    wnd.AboutToClose = true;
+                    wnd.Close();
+                }
             }
 
             return;
