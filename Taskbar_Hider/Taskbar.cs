@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Windows.Threading;
 
 namespace Taskbar_Hider
 {
@@ -16,6 +17,8 @@ namespace Taskbar_Hider
 
         [DllImport("shell32.dll", EntryPoint = "SHAppBarMessage")]
         private extern static uint SHAppBarMessage(uint dwMessage, ref APPBARDATA pData);
+
+        private DispatcherTimer timer;
 
         public bool IsHiden
         {
@@ -39,6 +42,37 @@ namespace Taskbar_Hider
             }
 
             CheckWhetherHiden();
+
+            timer = null;
+
+        }
+
+        private void OnTimerHandler(object sender, EventArgs e)
+        {
+            bool Ok = ConfirmHiden();
+            if(Ok)
+            {
+                ((DispatcherTimer)sender).Stop();
+            }
+        }
+
+        private bool ConfirmHiden()
+        {
+            if(IsWindowVisible(TBhWnd) == this.IsHiden)
+            {
+                if (IsHiden)
+                {
+                    SetTaskbarState(AppBarStates.AutoHide);
+                    System.Threading.Thread.Sleep(80);
+                    Show(false);
+                }
+                else
+                {
+                    SetTaskbarState(AppBarStates.AlwaysOnTop);
+                    Show(true);
+                }
+            }
+            return IsWindowVisible(TBhWnd) != this.IsHiden;
         }
 
         public void CheckWhetherHiden()
@@ -70,18 +104,15 @@ namespace Taskbar_Hider
 
         public void ChangeState()
         {
-            CheckWhetherHiden();
-            if (IsHiden)
+            IsHiden = !IsHiden;
+            ConfirmHiden();
+
+            timer = new DispatcherTimer
             {
-                SetTaskbarState(AppBarStates.AlwaysOnTop);
-                Show(true);
-            }
-            else
-            {
-                SetTaskbarState(AppBarStates.AutoHide);
-                System.Threading.Thread.Sleep(80);
-                Show(false);
-            }
+                Interval = new TimeSpan(0, 0, 0, 400),
+            };
+            timer.Tick += OnTimerHandler;
+            timer.Start();
         }
 
         //定义一些结构
