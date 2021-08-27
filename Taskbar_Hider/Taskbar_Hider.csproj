@@ -62,7 +62,7 @@
     <StartupObject>Taskbar_Hider.App</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>18FB3C66BE85E9409C668D938B48ABB6B23658E2</ManifestCertificateThumbprint>

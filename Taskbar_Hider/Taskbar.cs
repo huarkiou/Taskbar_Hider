@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Threading;
 using Taskbar_Hider.Utils.Pinvoke;
@@ -10,7 +11,7 @@ namespace Taskbar_Hider
     {
         private DispatcherTimer timer;
 
-        public bool IsHiden
+        public bool Visibility
         {
             get;
             set;
@@ -28,12 +29,27 @@ namespace Taskbar_Hider
             TBhWnd = User32.FindWindow("System_TrayWnd", null);
             if (TBhWnd == IntPtr.Zero)
             {
-                TBhWnd = User32.FindWindow("Shell_TrayWnd", null);
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+                while (TBhWnd == IntPtr.Zero)
+                {
+                    TBhWnd = User32.FindWindow("Shell_TrayWnd", null);
+                    if(sw.Elapsed == new TimeSpan(0,0,5))
+                    {
+                        throw new Exception("找不到任务栏句柄");
+                    }
+                }
             }
 
             CheckWhetherHiden();
 
-            timer = null;
+            timer = new DispatcherTimer
+            {
+                Interval = new TimeSpan(days: 0, hours: 0, minutes: 0, seconds: 0,milliseconds: 500),
+            };
+            timer.Tick += OnTimerHandler;
+            timer.Start();
+
 
         }
 
@@ -41,32 +57,45 @@ namespace Taskbar_Hider
         {
             if(ConfirmHiden())
             {
-                ((DispatcherTimer)sender).Stop();
+                if(User32.IsWindowVisible(TBhWnd) != Visibility)
+                {
+                    ConfirmHiden();
+                }
             }
         }
 
         private bool ConfirmHiden()
         {
-            if(User32.IsWindowVisible(TBhWnd) == this.IsHiden)
+            if (User32.IsWindowVisible(TBhWnd) != this.Visibility)
             {
-                if (IsHiden)
+                SetTaskbarState(this.Visibility);
+                Show(this.Visibility);
+            }
+            return User32.IsWindowVisible(TBhWnd) == this.Visibility;
+        }
+
+        public void ResetHandle()
+        {
+            TBhWnd = new IntPtr(0);
+            TBhWnd = User32.FindWindow("System_TrayWnd", null);
+            if (TBhWnd == IntPtr.Zero)
+            {
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+                while (TBhWnd == IntPtr.Zero)
                 {
-                    SetTaskbarState(Shell32.AppBarStates.AutoHide);
-                    System.Threading.Thread.Sleep(80);
-                    Show(false);
-                }
-                else
-                {
-                    SetTaskbarState(Shell32.AppBarStates.AlwaysOnTop);
-                    Show(true);
+                    TBhWnd = User32.FindWindow("Shell_TrayWnd", null);
+                    if (sw.Elapsed == new TimeSpan(0, 0, 5))
+                    {
+                        throw new Exception("找不到任务栏句柄");
+                    }
                 }
             }
-            return User32.IsWindowVisible(TBhWnd) != this.IsHiden;
         }
 
         public void CheckWhetherHiden()
         {
-            this.IsHiden = !User32.IsWindowVisible(TBhWnd);
+            this.Visibility = User32.IsWindowVisible(TBhWnd);
         }
 
 
@@ -84,19 +113,13 @@ namespace Taskbar_Hider
 
         public void ChangeState()
         {
-            IsHiden = !IsHiden;
-            ConfirmHiden();
+            Visibility = !Visibility;
 
-            if (timer != null)
-            {
-                timer.Stop();
-            }
-            timer = new DispatcherTimer
-            {
-                Interval = new TimeSpan(days: 0, hours: 0, minutes: 0, seconds: 0,milliseconds: 200),
-            };
-            timer.Tick += OnTimerHandler;
-            timer.Start();
+            SetTaskbarState(Visibility);
+            System.Threading.Thread.Sleep(80);
+            Show(Visibility);
+
+            ConfigHelper.ShowTaskbarOnStartup = Visibility;
         }
 
         
@@ -105,11 +128,20 @@ namespace Taskbar_Hider
         /// Set the Taskbar State option
         /// </summary>
         /// <param name="option">AppBarState to activate</param>
-        public void SetTaskbarState(Shell32.AppBarStates option)
+        public void SetTaskbarState(bool alwaysOnTop)
         {
             Shell32.APPBARDATA msgData = new Shell32.APPBARDATA();
             msgData.cbSize = (uint)Marshal.SizeOf(msgData);
             msgData.hWnd = TBhWnd;
+            Shell32.AppBarStates option;
+            if(alwaysOnTop)
+            {
+                option = Shell32.AppBarStates.AlwaysOnTop;
+            }
+            else
+            {
+                option = Shell32.AppBarStates.AutoHide;
+            }
             msgData.lParam = (int)(option);
             Shell32.SHAppBarMessage((uint)Shell32.AppBarMessages.SetState, ref msgData);
         }

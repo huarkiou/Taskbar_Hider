@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -34,6 +34,8 @@ namespace Taskbar_Hider
         {
             InitializeComponent();
             tb = new Taskbar();
+            tb.Visibility = ConfigHelper.ShowTaskbarOnStartup;
+
             hk = new HotKeys();
 
             // 设置ComboBox
@@ -149,6 +151,7 @@ namespace Taskbar_Hider
                 });
             }
             ConfigHelper.Modifiers = (HotKeys.HotkeyModifiers)modifiers[cb.SelectedIndex].index;
+            ConfigHelper.Save();
 
             if (m_Hwnd != IntPtr.Zero)
             {
@@ -177,6 +180,7 @@ namespace Taskbar_Hider
                 });
             }
             ConfigHelper.VKey = (HotKeys.EKey)vkeys[cb.SelectedIndex].index;
+            ConfigHelper.Save();
 
             if (m_Hwnd != IntPtr.Zero)
             {
@@ -199,6 +203,11 @@ namespace Taskbar_Hider
         private void Window_Closed(object sender, EventArgs e)
         {
             tray.Dispose();
+        }
+
+        private void ButtonReset_Click(object sender, RoutedEventArgs e)
+        {
+            tb.ResetHandle();
         }
     }
     public struct Keys

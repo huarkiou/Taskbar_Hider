@@ -27,6 +27,7 @@
         <ComboBox x:Name="VKey_comboBox" Grid.Row="0" Grid.Column="3" IsReadOnly="True" SelectionChanged="VKey_comboBox_SelectionChanged" VerticalAlignment="Center"/>
         <Label x:Name="label_func" Content="来显示/隐藏任务栏" Grid.Row="0" Grid.Column="4" FontSize="14" FontStyle="Normal" FontWeight="Normal" VerticalAlignment="Center"/>
 
-        <CheckBox x:Name="CheckBoxAutoRun" Grid.Row="1" Grid.Column="3" Content="开机自启动" Cursor="Hand" Click="CheckBoxAutoRun_Click" HorizontalAlignment="Center"/>
+        <Button x:Name="ButtonReset" Grid.Row="1" Grid.Column="1" Content="重置句柄" Click="ButtonReset_Click" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <CheckBox x:Name="CheckBoxAutoRun" Grid.Row="1" Grid.Column="3" Content="开机自启动" Cursor="Hand" Click="CheckBoxAutoRun_Click" VerticalAlignment="Center" HorizontalAlignment="Center"/>
     </Grid>
 </Window>
