@@ -6,7 +6,7 @@ namespace Taskbar_Hider
 {
     class ConfigHelper
     {
-        private static readonly string CONFIG_PATH = ".\\"+App.PROGRAM_NAME+ ".ini";
+        private static readonly string CONFIG_PATH = System.IO.Path.GetDirectoryName(Environment.ProcessPath) + @"\" + App.PROGRAM_NAME + ".ini";
         public static HotKeys.HotkeyModifiers Modifiers = HotKeys.HotkeyModifiers.Alt;
         public static HotKeys.EKey VKey = HotKeys.EKey.F2;
         public static bool ShowTaskbarOnStartup = true;
@@ -20,7 +20,11 @@ namespace Taskbar_Hider
                 {
                     while (!fd.EndOfStream)
                     {
-                        string line = fd.ReadLine();
+                        string? line = fd.ReadLine();
+                        if(line == null)
+                        {
+                            continue;
+                        }
                         string[] strSplit = line.Split('=');
                         if (strSplit[0] == "Modifiers")
                         {
@@ -30,16 +34,16 @@ namespace Taskbar_Hider
                         {
                             VKey = (HotKeys.EKey)Convert.ToInt32(strSplit[1]);
                         }
-                        else if(strSplit[0] == "ShowTaskbarOnStartup")
+                        else if (strSplit[0] == "ShowTaskbarOnStartup")
                         {
                             ShowTaskbarOnStartup = Convert.ToBoolean(strSplit[1]);
                         }
                     }
                 }
             }
-            catch(FileNotFoundException)
+            catch (FileNotFoundException)
             {
-                
+
             }
             return;
         }

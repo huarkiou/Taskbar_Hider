@@ -44,7 +44,12 @@ namespace Taskbar_Hider
             foreach (HotKeys.EKey i in Enum.GetValues(typeof(HotKeys.EKey)))
             {
                 tmp.index = (int)i;
-                tmp.key = Enum.GetName(typeof(HotKeys.EKey), i);
+                var key = Enum.GetName(typeof(HotKeys.EKey), i);
+                if (key == null)
+                {
+                    continue;
+                }
+                tmp.key = key;
                 if (!vkeys.Contains(tmp))
                 {
                     vkeys.Add(tmp);
@@ -68,7 +73,12 @@ namespace Taskbar_Hider
             foreach (HotKeys.EKey i in Enum.GetValues(typeof(HotKeys.HotkeyModifiers)))
             {
                 tmp2.index = (int)i;
-                tmp2.modifier = Enum.GetName(typeof(HotKeys.HotkeyModifiers), i);
+                var modifier = Enum.GetName(typeof(HotKeys.HotkeyModifiers), i);
+                if (modifier == null)
+                {
+                    continue;
+                }
+                tmp2.modifier = modifier;
                 if (!modifiers.Contains(tmp2))
                 {
                     modifiers.Add(tmp2);
@@ -226,8 +236,12 @@ namespace Taskbar_Hider
         {
             return this.key;
         }
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
+            if (obj == null)
+            {
+                return false;
+            }
             return index == ((Keys)obj).index;
         }
         public override int GetHashCode()
@@ -252,8 +266,12 @@ namespace Taskbar_Hider
         {
             return this.modifier;
         }
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
+            if (obj == null)
+            {
+                return false;
+            }
             return index == ((Modifiers)obj).index;
         }
         public override int GetHashCode()

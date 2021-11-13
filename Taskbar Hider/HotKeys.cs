@@ -97,7 +97,7 @@ namespace Taskbar_Hider
             {
                 case HotKeys.WM_HOTKEY:
                     int id = wideParam.ToInt32();
-                    HotKeyCallBackHanlder callback;
+                    HotKeyCallBackHanlder? callback;
                     if (keymap.TryGetValue(id, out callback))
                         callback();
                     break;

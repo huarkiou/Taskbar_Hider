@@ -7,8 +7,8 @@ namespace Taskbar_Hider
     /// </summary>
     public partial class App : Application
     {
-        public const string PROGRAM_NAME = "Taskbar Hider";
-        private MainWindow wnd;
+        public const string PROGRAM_NAME = "Taskbar_Hider";
+        private MainWindow? wnd;
         private void Application_Startup(object sender, StartupEventArgs e)
         {
 
@@ -17,8 +17,10 @@ namespace Taskbar_Hider
             {
                 mutex.ReleaseMutex();
                 ConfigHelper.Load();
-                wnd = new MainWindow();
-                wnd.ShowActivated = false;
+                wnd = new MainWindow
+                {
+                    ShowActivated = false
+                };
                 wnd.Show();
                 wnd.Hide();
             }

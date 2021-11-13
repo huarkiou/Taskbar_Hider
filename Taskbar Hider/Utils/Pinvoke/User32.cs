@@ -6,7 +6,7 @@ namespace Taskbar_Hider.Utils.Pinvoke
     public static class User32
     {
         [DllImport("User32.dll", EntryPoint = "FindWindow")]
-        public extern static IntPtr FindWindow(string lpClassName, string lpWindowName);
+        public extern static IntPtr FindWindow(string lpClassName, string? lpWindowName);
 
         [DllImport("User32.dll", EntryPoint = "IsWindowVisible")]
         public extern static bool IsWindowVisible(IntPtr hWnd);

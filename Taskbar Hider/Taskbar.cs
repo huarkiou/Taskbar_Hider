@@ -53,7 +53,7 @@ namespace Taskbar_Hider
 
         }
 
-        private void OnTimerHandler(object sender, EventArgs e)
+        private void OnTimerHandler(object? sender, EventArgs e)
         {
             if(ConfirmHiden())
             {
@@ -80,7 +80,7 @@ namespace Taskbar_Hider
             TBhWnd = User32.FindWindow("System_TrayWnd", null);
             if (TBhWnd == IntPtr.Zero)
             {
-                Stopwatch sw = new Stopwatch();
+                Stopwatch sw = new();
                 sw.Start();
                 while (TBhWnd == IntPtr.Zero)
                 {
