@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Taskbar_Hider.Utils.Pinvoke
+namespace Tbh.Utils.Pinvoke
 {
     public static class User32
     {

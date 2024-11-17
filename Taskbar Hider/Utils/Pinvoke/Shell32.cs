@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Taskbar_Hider.Utils.Pinvoke
+namespace Tbh.Utils.Pinvoke
 {
     public static class Shell32
     {

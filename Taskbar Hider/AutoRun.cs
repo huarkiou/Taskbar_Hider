@@ -1,4 +1,4 @@
-﻿namespace Taskbar_Hider
+﻿namespace Tbh
 {
     internal class AutoRun
     {

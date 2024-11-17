@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Taskbar_Hider
+namespace Tbh
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

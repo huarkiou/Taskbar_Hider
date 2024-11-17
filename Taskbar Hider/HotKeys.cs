@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace Taskbar_Hider
+namespace Tbh
 {
     public class HotKeys
     {
@@ -52,13 +52,13 @@ namespace Taskbar_Hider
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern short GlobalDeleteAtom(string nAtom);
 
-        /// <summary> 
+        /// <summary>
         /// 注册快捷键
-        /// </summary> 
-        /// <param name="hWnd">持有快捷键窗口的句柄</param> 
-        /// <param name="fsModifiers">组合键</param> 
-        /// <param name="vk">快捷键的虚拟键码</param> 
-        /// <param name="callBack">回调函数（按下快捷键时被调用的方法）</param> 
+        /// </summary>
+        /// <param name="hWnd">持有快捷键窗口的句柄</param>
+        /// <param name="fsModifiers">组合键</param>
+        /// <param name="vk">快捷键的虚拟键码</param>
+        /// <param name="callBack">回调函数（按下快捷键时被调用的方法）</param>
         public void Regist(IntPtr hWnd, int modifiers, EKey vk, HotKeyCallBackHanlder callBack)
         {
             int id = GlobalAddAtom("Taskbar Hider");
@@ -67,11 +67,11 @@ namespace Taskbar_Hider
             keymap[id] = callBack;
         }
 
-        /// <summary> 
+        /// <summary>
         /// 注销快捷键
-        /// </summary> 
-        /// <param name="hWnd">持有快捷键窗口的句柄</param> 
-        /// <param name="callBack">回调函数</param> 
+        /// </summary>
+        /// <param name="hWnd">持有快捷键窗口的句柄</param>
+        /// <param name="callBack">回调函数</param>
         public void UnRegist(IntPtr hWnd, HotKeyCallBackHanlder callBack)
         {
             GlobalDeleteAtom("Taskbar Hider");

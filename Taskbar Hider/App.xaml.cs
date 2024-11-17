@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace Taskbar_Hider
+namespace Tbh
 {
     /// <summary>
     /// Interaction logic for App.xaml

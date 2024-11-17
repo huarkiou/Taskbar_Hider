@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Drawing;
+using System.Reflection;
 using System.Windows;
 
-namespace Taskbar_Hider
+namespace Tbh
 {
     internal class NotifyIcon
     {
@@ -22,7 +23,7 @@ namespace Taskbar_Hider
 
             // 导入嵌入的资源
             //MessageBox.Show(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name + ".Resources.Icon_MainWindow.ico");
-            string name = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name + ".Resources.Icon_MainWindow.ico";
+            string name = MethodBase.GetCurrentMethod()?.DeclaringType?.Namespace + ".Resources.Icon_MainWindow.ico";
             System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
             System.IO.Stream? stream = assembly.GetManifestResourceStream(name);
             //var list = assembly.GetManifestResourceNames();
@@ -32,6 +33,7 @@ namespace Taskbar_Hider
             if (stream == null)
             {
                 MessageBox.Show("Cannot file notifyicon", "Error", MessageBoxButton.OKCancel);
+                Environment.Exit(-1);
             }
             else
             {

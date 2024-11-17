@@ -2,10 +2,10 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Threading;
-using Taskbar_Hider.Utils.Pinvoke;
+using Tbh.Utils.Pinvoke;
 
 
-namespace Taskbar_Hider
+namespace Tbh
 {
     internal class Taskbar
     {

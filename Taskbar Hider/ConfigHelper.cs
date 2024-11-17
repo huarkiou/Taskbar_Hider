@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using System.IO;
 
-namespace Taskbar_Hider
+namespace Tbh
 {
     class ConfigHelper
     {

@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
-    <RootNamespace>Taskbar_Hider</RootNamespace>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>Tbh</RootNamespace>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    <UseWindowsForms>True</UseWindowsForms>
+    <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>Resources\Icon_MainWindow.ico</ApplicationIcon>
   </PropertyGroup>
 
