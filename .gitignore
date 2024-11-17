@@ -1,5 +1,7 @@
 ﻿/Taskbar Hider/bin
 /Taskbar Hider/obj
+/Taskbar Hider/Properties
+/Taskbar Hider/Taskbar_Hider.csproj.user
 /.vs
 /Backup
 UpgradeLog.htm
