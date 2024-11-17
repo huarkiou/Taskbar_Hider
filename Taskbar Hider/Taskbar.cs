@@ -11,6 +11,8 @@ namespace Tbh
     {
         private DispatcherTimer timer;
 
+        private bool DefaultAutoHide = false;
+
         public bool Visibility
         {
             get;
@@ -25,6 +27,7 @@ namespace Tbh
 
         public Taskbar()
         {
+            // 设置任务栏句柄
             TBhWnd = new IntPtr(0);
             TBhWnd = User32.FindWindow("System_TrayWnd", null);
             if (TBhWnd == IntPtr.Zero)
@@ -34,18 +37,23 @@ namespace Tbh
                 while (TBhWnd == IntPtr.Zero)
                 {
                     TBhWnd = User32.FindWindow("Shell_TrayWnd", null);
-                    if(sw.Elapsed == new TimeSpan(0,0,5))
+                    if (sw.Elapsed == new TimeSpan(0, 0, 5))
                     {
                         throw new Exception("找不到任务栏句柄");
                     }
                 }
             }
 
-            CheckWhetherHiden();
+            // 检查并保存当前任务栏状态
+            Shell32.AppBarStates taskbar_state = GetTaskbarState();
+            this.DefaultAutoHide = (taskbar_state == Shell32.AppBarStates.AutoHide)
+                || ((taskbar_state == (Shell32.AppBarStates.AutoHide | Shell32.AppBarStates.AlwaysOnTop)));
+            this.Visibility = User32.IsWindowVisible(TBhWnd);
 
+            // 设置定时器用于定时检查任务栏的隐藏情况
             timer = new DispatcherTimer
             {
-                Interval = new TimeSpan(days: 0, hours: 0, minutes: 0, seconds: 0,milliseconds: 500),
+                Interval = new TimeSpan(days: 0, hours: 0, minutes: 0, seconds: 0, milliseconds: 500),
             };
             timer.Tick += OnTimerHandler;
             timer.Start();
@@ -55,9 +63,9 @@ namespace Tbh
 
         private void OnTimerHandler(object? sender, EventArgs e)
         {
-            if(ConfirmHiden())
+            if (ConfirmHiden())
             {
-                if(User32.IsWindowVisible(TBhWnd) != Visibility)
+                if (User32.IsWindowVisible(TBhWnd) != Visibility)
                 {
                     ConfirmHiden();
                 }
@@ -93,12 +101,6 @@ namespace Tbh
             }
         }
 
-        public void CheckWhetherHiden()
-        {
-            this.Visibility = User32.IsWindowVisible(TBhWnd);
-        }
-
-
         public void Show(bool show)
         {
             if (show)
@@ -115,14 +117,17 @@ namespace Tbh
         {
             Visibility = !Visibility;
 
-            SetTaskbarState(Visibility);
+            if (!this.DefaultAutoHide)
+            {
+                SetTaskbarState(Visibility);
+            }
             System.Threading.Thread.Sleep(80);
             Show(Visibility);
 
             ConfigHelper.ShowTaskbarOnStartup = Visibility;
         }
 
-        
+
 
         /// <summary>
         /// Set the Taskbar State option
@@ -134,7 +139,7 @@ namespace Tbh
             msgData.cbSize = (uint)Marshal.SizeOf(msgData);
             msgData.hWnd = TBhWnd;
             Shell32.AppBarStates option;
-            if(alwaysOnTop)
+            if (alwaysOnTop)
             {
                 option = Shell32.AppBarStates.AlwaysOnTop;
             }
