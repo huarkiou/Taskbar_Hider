@@ -6,15 +6,15 @@ namespace Tbh;
 /// <summary>
 ///     Interaction logic for App.xaml
 /// </summary>
-public partial class App : Application
+public partial class App
 {
     public const string ProgramName = "Taskbar-Hider";
     private MainWindow? _wnd;
 
     private void Application_Startup(object sender, StartupEventArgs e)
     {
-        var mutex = new Mutex(true, "Global\\" + ProgramName, out var runone);
-        if (runone)
+        var mutex = new Mutex(true, "Global\\" + ProgramName, out var createdNew);
+        if (createdNew)
         {
             mutex.ReleaseMutex();
             ConfigHelper.Load();
@@ -45,7 +45,5 @@ public partial class App : Application
     private void Application_SessionEnding(object sender, SessionEndingCancelEventArgs e)
     {
         ConfigHelper.Save();
-        //wnd.AboutToClose = true;
-        //wnd.Close();
     }
 }

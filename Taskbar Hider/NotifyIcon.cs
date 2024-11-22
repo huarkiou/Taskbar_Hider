@@ -23,7 +23,7 @@ internal class NotifyIcon
         var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(name);
         if (stream == null)
         {
-            MessageBox.Show("Cannot file notifyicon", "Error", MessageBoxButton.OKCancel);
+            MessageBox.Show("Cannot create notifyicon", "Error", MessageBoxButton.OKCancel);
             Environment.Exit(-1);
         }
         else

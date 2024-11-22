@@ -101,7 +101,7 @@ internal class Taskbar
         Thread.Sleep(80);
         Show(Visibility);
 
-        ConfigHelper.ShowTaskbarOnStartup = Visibility;
+        ConfigHelper.Config.ShowTaskbarOnStartup = Visibility;
     }
 
     /// <summary>

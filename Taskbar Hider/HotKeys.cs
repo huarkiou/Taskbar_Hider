@@ -36,10 +36,10 @@ public class HotKeys
     /// <param name="callBack">回调函数</param>
     internal void Unregister(HWND hWnd, HotKeyCallBackHandler callBack)
     {
-        foreach (var var in _keymap.Where(var => var.Value == callBack))
+        foreach (var (key, _) in _keymap.Where(pair => pair.Value == callBack))
         {
-            PInvoke.UnregisterHotKey(hWnd, var.Key);
-            PInvoke.GlobalDeleteAtom((ushort)var.Key);
+            PInvoke.UnregisterHotKey(hWnd, key);
+            PInvoke.GlobalDeleteAtom((ushort)key);
         }
     }
 

@@ -31,7 +31,7 @@ public partial class MainWindow
         InitializeComponent();
         _tb = new Taskbar
         {
-            Visibility = ConfigHelper.ShowTaskbarOnStartup
+            Visibility = ConfigHelper.Config.ShowTaskbarOnStartup
         };
 
         _hk = new HotKeys();
@@ -50,7 +50,7 @@ public partial class MainWindow
         }
 
         VKeyComboBox.ItemsSource = _vKeys;
-        VKeyComboBox.SelectedIndex = _vKeys.FindIndex(k => k.Index == (int)ConfigHelper.VKey);
+        VKeyComboBox.SelectedIndex = _vKeys.FindIndex(k => k.Index == (int)ConfigHelper.Config.VKey);
 
         _modifiers = [];
         var tmp2 = new Modifiers();
@@ -65,14 +65,14 @@ public partial class MainWindow
         }
 
         ModifiersComboBox.ItemsSource = _modifiers;
-        ModifiersComboBox.SelectedIndex = _modifiers.FindIndex(k => k.Index == (int)ConfigHelper.Modifiers);
+        ModifiersComboBox.SelectedIndex = _modifiers.FindIndex(k => k.Index == (int)ConfigHelper.Config.Modifiers);
 
         _autorun = new AutoRun("Taskbar Hider");
         CheckBoxAutoRun.IsChecked = _autorun.RunOnBoot;
         _tray = new NotifyIcon(this);
     }
 
-    public bool AboutToClose { set; get; } = false;
+    public bool AboutToClose { set; get; }
 
     ~MainWindow()
     {
@@ -89,7 +89,7 @@ public partial class MainWindow
         // 添加处理程序
         hWndSource?.AddHook(_hk.OnHotkey);
         // 注册热键
-        _hk.Register(_hWnd, ConfigHelper.Modifiers, ConfigHelper.VKey, _tb.ChangeState);
+        _hk.Register(_hWnd, ConfigHelper.Config.Modifiers, ConfigHelper.Config.VKey, _tb.ChangeState);
     }
 
     private void CheckBoxAutoRun_Click(object sender, RoutedEventArgs e)
@@ -105,24 +105,24 @@ public partial class MainWindow
     {
         var cb = sender as ComboBox ?? throw new NullReferenceException();
         if (cb.SelectedIndex == -1)
-            cb.SelectedIndex = _modifiers.FindIndex(k => k.Index == (int)ConfigHelper.Modifiers);
+            cb.SelectedIndex = _modifiers.FindIndex(k => k.Index == (int)ConfigHelper.Config.Modifiers);
 
-        ConfigHelper.Modifiers = (HOT_KEY_MODIFIERS)_modifiers[cb.SelectedIndex].Index;
+        ConfigHelper.Config.Modifiers = (HOT_KEY_MODIFIERS)_modifiers[cb.SelectedIndex].Index;
         ConfigHelper.Save();
 
         if (_hWnd == HWND.Null) return;
         // 取消注册热键
         _hk.Unregister(_hWnd, _tb.ChangeState);
         // 注册热键
-        _hk.Register(_hWnd, ConfigHelper.Modifiers, ConfigHelper.VKey, _tb.ChangeState);
+        _hk.Register(_hWnd, ConfigHelper.Config.Modifiers, ConfigHelper.Config.VKey, _tb.ChangeState);
     }
 
     private void VKey_comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         var cb = sender as ComboBox ?? throw new NullReferenceException();
-        if (cb.SelectedIndex == -1) cb.SelectedIndex = _vKeys.FindIndex(k => k.Index == (int)ConfigHelper.VKey);
+        if (cb.SelectedIndex == -1) cb.SelectedIndex = _vKeys.FindIndex(k => k.Index == (int)ConfigHelper.Config.VKey);
 
-        ConfigHelper.VKey = (VIRTUAL_KEY)_vKeys[cb.SelectedIndex].Index;
+        ConfigHelper.Config.VKey = (VIRTUAL_KEY)_vKeys[cb.SelectedIndex].Index;
         ConfigHelper.Save();
 
         if (_hWnd != HWND.Null)
@@ -130,7 +130,7 @@ public partial class MainWindow
             // 取消注册热键
             _hk.Unregister(_hWnd, _tb.ChangeState);
             // 注册热键
-            _hk.Register(_hWnd, ConfigHelper.Modifiers, ConfigHelper.VKey, _tb.ChangeState);
+            _hk.Register(_hWnd, ConfigHelper.Config.Modifiers, ConfigHelper.Config.VKey, _tb.ChangeState);
         }
     }
 
