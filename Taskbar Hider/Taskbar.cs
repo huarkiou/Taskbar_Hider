@@ -33,8 +33,8 @@ internal class Taskbar
 
         // 检查并保存当前任务栏状态
         var taskbarState = GetTaskbarState();
-        _defaultAutoHide = taskbarState is AppBarStates.AutoHide
-            or (AppBarStates.AutoHide | AppBarStates.AlwaysOnTop);
+        _defaultAutoHide = taskbarState is PInvoke.ABS_AUTOHIDE
+            or (PInvoke.ABS_AUTOHIDE | PInvoke.ABS_ALWAYSONTOP);
         Visibility = PInvoke.IsWindowVisible(HWnd);
 
         // 设置定时器用于定时检查任务栏的隐藏情况
@@ -113,22 +113,22 @@ internal class Taskbar
         var msgData = new APPBARDATA();
         msgData.cbSize = (uint)Marshal.SizeOf(msgData);
         msgData.hWnd = HWnd;
-        var option = alwaysOnTop ? AppBarStates.AlwaysOnTop : AppBarStates.AutoHide;
+        var option = alwaysOnTop ? PInvoke.ABS_ALWAYSONTOP : PInvoke.ABS_AUTOHIDE;
 
-        msgData.lParam = (int)option;
-        PInvoke.SHAppBarMessage((uint)AppBarMessages.SetState, ref msgData);
+        msgData.lParam = (nint)option;
+        PInvoke.SHAppBarMessage(PInvoke.ABM_SETSTATE, ref msgData);
     }
 
     /// <summary>
     ///     Gets the current Taskbar state
     /// </summary>
     /// <returns>current Taskbar state</returns>
-    private AppBarStates GetTaskbarState()
+    private uint GetTaskbarState()
     {
         var msgData = new APPBARDATA();
         msgData.cbSize = (uint)Marshal.SizeOf(msgData);
         msgData.hWnd = HWnd;
-        return (AppBarStates)PInvoke.SHAppBarMessage((uint)AppBarMessages.GetState, ref msgData);
+        return PInvoke.SHAppBarMessage(PInvoke.ABM_GETSTATE, ref msgData).ToUInt32();
     }
 } // class Taskbar
 // namespace Taskbar_Hider

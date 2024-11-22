@@ -11,11 +11,6 @@ public class HotKeys
 {
     public delegate void HotKeyCallBackHandler();
 
-    /// <summary>
-    ///     热键消息
-    /// </summary>
-    private const int WM_HOTKEY = 0x312;
-
     private readonly Dictionary<int, HotKeyCallBackHandler> _keymap = new();
 
     /// <summary>
@@ -61,7 +56,7 @@ public class HotKeys
     {
         switch (msg)
         {
-            case WM_HOTKEY:
+            case (int)PInvoke.WM_HOTKEY:
                 var id = wideParam.ToInt32();
                 if (_keymap.TryGetValue(id, out var callback))
                     callback();
