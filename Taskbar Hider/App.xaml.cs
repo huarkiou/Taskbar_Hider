@@ -7,35 +7,34 @@ namespace Tbh
     /// </summary>
     public partial class App : Application
     {
-        public const string PROGRAM_NAME = "Taskbar_Hider";
-        private MainWindow? wnd;
+        public const string ProgramName = "Taskbar_Hider";
+        private MainWindow? _wnd;
+
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-
-            var mutex = new System.Threading.Mutex(true, "Global\\" + PROGRAM_NAME, out bool runone);
+            var mutex = new System.Threading.Mutex(true, "Global\\" + ProgramName, out var runone);
             if (runone)
             {
                 mutex.ReleaseMutex();
                 ConfigHelper.Load();
-                wnd = new MainWindow
+                _wnd = new MainWindow
                 {
                     ShowActivated = false
                 };
-                wnd.Show();
-                wnd.Hide();
+                _wnd.Show();
+                _wnd.Hide();
             }
             else
             {
-                MessageBox.Show("已启动一个"+ PROGRAM_NAME + "实例,不必重复启动。");
-                if (wnd != null)
+                MessageBox.Show("已启动一个" + ProgramName + "实例,不必重复启动。");
+                if (_wnd != null)
                 {
-                    wnd.AboutToClose = true;
-                    wnd.Close();
+                    _wnd.AboutToClose = true;
+                    _wnd.Close();
                 }
             }
-
-            return;
         }
+
         protected override void OnExit(ExitEventArgs e)
         {
             ConfigHelper.Save();

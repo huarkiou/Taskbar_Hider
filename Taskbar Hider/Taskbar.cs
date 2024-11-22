@@ -2,41 +2,33 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Threading;
-using Tbh.Utils.Pinvoke;
-
+using static Tbh.Utils.Pinvoke.Shell32;
+using static Tbh.Utils.Pinvoke.User32;
 
 namespace Tbh
 {
     internal class Taskbar
     {
-        private DispatcherTimer timer;
+        private readonly DispatcherTimer _timer;
 
-        private bool DefaultAutoHide = false;
+        private readonly bool _defaultAutoHide;
 
-        public bool Visibility
-        {
-            get;
-            set;
-        }
+        public bool Visibility { get; set; }
 
-        public IntPtr TBhWnd
-        {
-            get;
-            set;
-        }
+        private IntPtr HWnd { get; set; }
 
         public Taskbar()
         {
             // 设置任务栏句柄
-            TBhWnd = new IntPtr(0);
-            TBhWnd = User32.FindWindow("System_TrayWnd", null);
-            if (TBhWnd == IntPtr.Zero)
+            HWnd = new IntPtr(0);
+            HWnd = FindWindow("System_TrayWnd", null);
+            if (HWnd == IntPtr.Zero)
             {
-                Stopwatch sw = new Stopwatch();
+                var sw = new Stopwatch();
                 sw.Start();
-                while (TBhWnd == IntPtr.Zero)
+                while (HWnd == IntPtr.Zero)
                 {
-                    TBhWnd = User32.FindWindow("Shell_TrayWnd", null);
+                    HWnd = FindWindow("Shell_TrayWnd", null);
                     if (sw.Elapsed == new TimeSpan(0, 0, 5))
                     {
                         throw new Exception("找不到任务栏句柄");
@@ -45,54 +37,53 @@ namespace Tbh
             }
 
             // 检查并保存当前任务栏状态
-            Shell32.AppBarStates taskbar_state = GetTaskbarState();
-            this.DefaultAutoHide = (taskbar_state == Shell32.AppBarStates.AutoHide)
-                || ((taskbar_state == (Shell32.AppBarStates.AutoHide | Shell32.AppBarStates.AlwaysOnTop)));
-            this.Visibility = User32.IsWindowVisible(TBhWnd);
+            var taskbarState = GetTaskbarState();
+            this._defaultAutoHide = taskbarState is AppBarStates.AutoHide
+                or (AppBarStates.AutoHide | AppBarStates.AlwaysOnTop);
+            this.Visibility = IsWindowVisible(HWnd);
 
             // 设置定时器用于定时检查任务栏的隐藏情况
-            timer = new DispatcherTimer
+            _timer = new DispatcherTimer
             {
                 Interval = new TimeSpan(days: 0, hours: 0, minutes: 0, seconds: 0, milliseconds: 500),
             };
-            timer.Tick += OnTimerHandler;
-            timer.Start();
-
-
+            _timer.Tick += OnTimerHandler;
+            _timer.Start();
         }
 
         private void OnTimerHandler(object? sender, EventArgs e)
         {
-            if (ConfirmHiden())
+            if (IsVisible())
             {
-                if (User32.IsWindowVisible(TBhWnd) != Visibility)
+                if (IsWindowVisible(HWnd) != Visibility)
                 {
-                    ConfirmHiden();
+                    IsVisible();
                 }
             }
         }
 
-        private bool ConfirmHiden()
+        private bool IsVisible()
         {
-            if (User32.IsWindowVisible(TBhWnd) != this.Visibility)
+            if (IsWindowVisible(HWnd) != this.Visibility)
             {
                 SetTaskbarState(this.Visibility);
                 Show(this.Visibility);
             }
-            return User32.IsWindowVisible(TBhWnd) == this.Visibility;
+
+            return IsWindowVisible(HWnd) == this.Visibility;
         }
 
         public void ResetHandle()
         {
-            TBhWnd = new IntPtr(0);
-            TBhWnd = User32.FindWindow("System_TrayWnd", null);
-            if (TBhWnd == IntPtr.Zero)
+            HWnd = new IntPtr(0);
+            HWnd = FindWindow("System_TrayWnd", null);
+            if (HWnd == IntPtr.Zero)
             {
                 Stopwatch sw = new();
                 sw.Start();
-                while (TBhWnd == IntPtr.Zero)
+                while (HWnd == IntPtr.Zero)
                 {
-                    TBhWnd = User32.FindWindow("Shell_TrayWnd", null);
+                    HWnd = FindWindow("Shell_TrayWnd", null);
                     if (sw.Elapsed == new TimeSpan(0, 0, 5))
                     {
                         throw new Exception("找不到任务栏句柄");
@@ -101,68 +92,51 @@ namespace Tbh
             }
         }
 
-        public void Show(bool show)
+        private void Show(bool show)
         {
-            if (show)
-            {
-                User32.ShowWindow(TBhWnd, User32.SW.SW_SHOW);
-            }
-            else
-            {
-                User32.ShowWindow(TBhWnd, User32.SW.SW_HIDE);
-            }
+            ShowWindow(HWnd, show ? SW.SW_SHOW : SW.SW_HIDE);
         }
 
         public void ChangeState()
         {
             Visibility = !Visibility;
 
-            if (!this.DefaultAutoHide)
+            if (!this._defaultAutoHide)
             {
                 SetTaskbarState(Visibility);
             }
+
             System.Threading.Thread.Sleep(80);
             Show(Visibility);
 
             ConfigHelper.ShowTaskbarOnStartup = Visibility;
         }
 
-
-
         /// <summary>
         /// Set the Taskbar State option
         /// </summary>
-        /// <param name="option">AppBarState to activate</param>
-        public void SetTaskbarState(bool alwaysOnTop)
+        /// <param name="alwaysOnTop"></param>
+        private void SetTaskbarState(bool alwaysOnTop)
         {
-            Shell32.APPBARDATA msgData = new Shell32.APPBARDATA();
+            var msgData = new APPBARDATA();
             msgData.cbSize = (uint)Marshal.SizeOf(msgData);
-            msgData.hWnd = TBhWnd;
-            Shell32.AppBarStates option;
-            if (alwaysOnTop)
-            {
-                option = Shell32.AppBarStates.AlwaysOnTop;
-            }
-            else
-            {
-                option = Shell32.AppBarStates.AutoHide;
-            }
+            msgData.hWnd = HWnd;
+            var option = alwaysOnTop ? AppBarStates.AlwaysOnTop : AppBarStates.AutoHide;
+
             msgData.lParam = (int)(option);
-            Shell32.SHAppBarMessage((uint)Shell32.AppBarMessages.SetState, ref msgData);
+            SHAppBarMessage((uint)AppBarMessages.SetState, ref msgData);
         }
 
         /// <summary>
         /// Gets the current Taskbar state
         /// </summary>
         /// <returns>current Taskbar state</returns>
-        public Shell32.AppBarStates GetTaskbarState()
+        private AppBarStates GetTaskbarState()
         {
-            Shell32.APPBARDATA msgData = new Shell32.APPBARDATA();
+            APPBARDATA msgData = new APPBARDATA();
             msgData.cbSize = (uint)Marshal.SizeOf(msgData);
-            msgData.hWnd = TBhWnd;
-            return (Shell32.AppBarStates)Shell32.SHAppBarMessage((uint)Shell32.AppBarMessages.GetState, ref msgData);
+            msgData.hWnd = HWnd;
+            return (AppBarStates)SHAppBarMessage((uint)AppBarMessages.GetState, ref msgData);
         }
-
     } // class Taskbar
-
-} // namspace Taskbar_Hider
+} // namespace Taskbar_Hider

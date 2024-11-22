@@ -7,14 +7,14 @@ namespace Tbh
 {
     internal class NotifyIcon
     {
-        private readonly System.Windows.Forms.NotifyIcon notifyicon;
-        private readonly MainWindow mainwindow;
+        private readonly System.Windows.Forms.NotifyIcon _notifyicon;
+        private readonly MainWindow _mainwindow;
 
         public NotifyIcon(MainWindow win)
         {
-            mainwindow = win;
+            _mainwindow = win;
             // 初始化托盘菜单
-            this.notifyicon = new System.Windows.Forms.NotifyIcon();
+            _notifyicon = new System.Windows.Forms.NotifyIcon();
 
             // 导入资源
             //Uri uri = new(@"Resources\Icon_MainWindow.ico", UriKind.Relative);
@@ -23,8 +23,8 @@ namespace Tbh
 
             // 导入嵌入的资源
             //MessageBox.Show(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name + ".Resources.Icon_MainWindow.ico");
-            string name = MethodBase.GetCurrentMethod()?.DeclaringType?.Namespace + ".Resources.Icon_MainWindow.ico";
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            var name = MethodBase.GetCurrentMethod()?.DeclaringType?.Namespace + ".Resources.Icon_MainWindow.ico";
+            Assembly assembly = Assembly.GetExecutingAssembly();
             System.IO.Stream? stream = assembly.GetManifestResourceStream(name);
             //var list = assembly.GetManifestResourceNames();
             //foreach (string item in list) {
@@ -37,43 +37,43 @@ namespace Tbh
             }
             else
             {
-                notifyicon.Icon = new Icon(stream);
+                _notifyicon.Icon = new Icon(stream);
             }
 
-            notifyicon.Text = "Taskbar Hider";
-            notifyicon.DoubleClick += new EventHandler(this.Show_Clicked);
-            notifyicon.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
-            notifyicon.ContextMenuStrip.Items.Add("显示/隐藏", null, Show_Clicked);
-            notifyicon.ContextMenuStrip.Items.Add("退出", null, Quit_Clicked);
-            notifyicon.Visible = true;
+            _notifyicon.Text = "Taskbar Hider";
+            _notifyicon.DoubleClick += Show_Clicked;
+            _notifyicon.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
+            _notifyicon.ContextMenuStrip.Items.Add("显示/隐藏", null, Show_Clicked);
+            _notifyicon.ContextMenuStrip.Items.Add("退出", null, Quit_Clicked);
+            _notifyicon.Visible = true;
         }
 
         ~NotifyIcon()
         {
-            this.Dispose();
+            Dispose();
         }
 
         public void Dispose()
         {
-            this.notifyicon.Dispose();
+            _notifyicon.Dispose();
         }
 
-        public void Quit_Clicked(Object? sender, EventArgs e)
+        private void Quit_Clicked(Object? sender, EventArgs e)
         {
-            this.mainwindow.AboutToClose = true;
-            mainwindow.Close();
+            _mainwindow.AboutToClose = true;
+            _mainwindow.Close();
         }
 
-        public void Show_Clicked(Object? sender, EventArgs e)
+        private void Show_Clicked(Object? sender, EventArgs e)
         {
-            if (mainwindow.IsVisible)
+            if (_mainwindow.IsVisible)
             {
-                mainwindow.Hide();
+                _mainwindow.Hide();
             }
             else
             {
-                mainwindow.Show();
-                mainwindow.Activate();
+                _mainwindow.Show();
+                _mainwindow.Activate();
             }
         }
     }

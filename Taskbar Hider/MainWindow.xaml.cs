@@ -1,132 +1,113 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Interop;
 
 namespace Tbh
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         // 主窗口句柄
-        public IntPtr m_Hwnd;
+        private IntPtr _hWnd;
 
-        private readonly Taskbar tb;
-        private readonly HotKeys hk;
+        private readonly Taskbar _tb;
+        private readonly HotKeys _hk;
 
-        private readonly List<Keys> vkeys;
-        private readonly List<Modifiers> modifiers;
+        private readonly List<Keys> _vkeys;
+        private readonly List<Modifiers> _modifiers;
 
-        private readonly AutoRun autorun;
-        private readonly NotifyIcon tray;
+        private readonly AutoRun _autorun;
+        private readonly NotifyIcon _tray;
 
-        private bool _close = false;
-
-        public bool AboutToClose
-        {
-            set { _close = value; }
-            get { return _close; }
-        }
+        public bool AboutToClose { set; get; } = false;
 
         public MainWindow()
         {
             InitializeComponent();
-            tb = new Taskbar();
-            tb.Visibility = ConfigHelper.ShowTaskbarOnStartup;
+            _tb = new Taskbar
+            {
+                Visibility = ConfigHelper.ShowTaskbarOnStartup
+            };
 
-            hk = new HotKeys();
+            _hk = new HotKeys();
 
             // 设置ComboBox
-            vkeys = new List<Keys>();
-            Keys tmp = new Keys();
+            _vkeys = [];
+            var tmp = new Keys();
             foreach (HotKeys.EKey i in Enum.GetValues(typeof(HotKeys.EKey)))
             {
-                tmp.index = (int)i;
+                tmp.Index = (int)i;
                 var key = Enum.GetName(typeof(HotKeys.EKey), i);
                 if (key == null)
                 {
                     continue;
                 }
-                tmp.key = key;
-                if (!vkeys.Contains(tmp))
+
+                tmp.Key = key;
+                if (!_vkeys.Contains(tmp))
                 {
-                    vkeys.Add(tmp);
+                    _vkeys.Add(tmp);
                 }
             }
-            this.VKey_comboBox.ItemsSource = vkeys;
-            this.VKey_comboBox.SelectedIndex = vkeys.FindIndex((Keys k) =>
-                {
-                    if (k.index == (int)ConfigHelper.VKey)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                });
 
-            modifiers = new List<Modifiers>();
-            Modifiers tmp2 = new Modifiers();
+            VKeyComboBox.ItemsSource = _vkeys;
+            VKeyComboBox.SelectedIndex = _vkeys.FindIndex(k => k.Index == (int)ConfigHelper.VKey);
+
+            _modifiers = [];
+            var tmp2 = new Modifiers();
             foreach (HotKeys.EKey i in Enum.GetValues(typeof(HotKeys.HotkeyModifiers)))
             {
-                tmp2.index = (int)i;
+                tmp2.Index = (int)i;
                 var modifier = Enum.GetName(typeof(HotKeys.HotkeyModifiers), i);
                 if (modifier == null)
                 {
                     continue;
                 }
-                tmp2.modifier = modifier;
-                if (!modifiers.Contains(tmp2))
+
+                tmp2.Modifier = modifier;
+                if (!_modifiers.Contains(tmp2))
                 {
-                    modifiers.Add(tmp2);
+                    _modifiers.Add(tmp2);
                 }
             }
-            this.Modifiers_comboBox.ItemsSource = modifiers;
-            this.Modifiers_comboBox.SelectedIndex = modifiers.FindIndex((Modifiers k) =>
-                {
-                    if (k.index == (int)ConfigHelper.Modifiers)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                });
 
-            autorun = new AutoRun("Taskbar Hider");
-            this.CheckBoxAutoRun.IsChecked = autorun.RunOnBoot;
-            tray = new NotifyIcon(this);
+            ModifiersComboBox.ItemsSource = _modifiers;
+            ModifiersComboBox.SelectedIndex = _modifiers.FindIndex(k =>
+            {
+                if (k.Index == (int)ConfigHelper.Modifiers)
+                {
+                    return true;
+                }
+
+                return false;
+            });
+
+            _autorun = new AutoRun("Taskbar Hider");
+            CheckBoxAutoRun.IsChecked = _autorun.RunOnBoot;
+            _tray = new NotifyIcon(this);
         }
 
         ~MainWindow()
         {
             // 取消注册热键
-            hk.UnRegist(m_Hwnd, tb.ChangeState);
+            _hk.UnRegist(_hWnd, _tb.ChangeState);
         }
 
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
             // 获取窗体句柄
-            m_Hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
-            System.Windows.Interop.HwndSource hWndSource = System.Windows.Interop.HwndSource.FromHwnd(m_Hwnd);
+            _hWnd = new WindowInteropHelper(this).Handle;
+            var hWndSource = HwndSource.FromHwnd(_hWnd);
             // 添加处理程序
-            if (hWndSource != null) hWndSource.AddHook(hk.OnHotkey);
+            hWndSource?.AddHook(_hk.OnHotkey);
             // 注册热键
-            hk.Regist(this.m_Hwnd, (int)ConfigHelper.Modifiers, ConfigHelper.VKey, tb.ChangeState);
-        }
-
-        /// <summary>
-        /// 所有控件初始化完成后调用
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnContentRendered(EventArgs e)
-        {
-            base.OnContentRendered(e);
+            _hk.Regist(_hWnd, (int)ConfigHelper.Modifiers, ConfigHelper.VKey, _tb.ChangeState);
         }
 
         private void CheckBoxAutoRun_Click(object sender, RoutedEventArgs e)
@@ -134,11 +115,11 @@ namespace Tbh
             CheckBox cb = (CheckBox)sender;
             if (cb.IsChecked == true)
             {
-                autorun.SetStartupOnBoot(true);
+                _autorun.SetStartupOnBoot(true);
             }
             else if (cb.IsChecked == false)
             {
-                autorun.SetStartupOnBoot(false);
+                _autorun.SetStartupOnBoot(false);
             }
         }
 
@@ -148,27 +129,26 @@ namespace Tbh
             ComboBox cb = (ComboBox)sender;
             if (cb.SelectedIndex == -1)
             {
-                cb.SelectedIndex = modifiers.FindIndex((Modifiers k) =>
+                cb.SelectedIndex = _modifiers.FindIndex(k =>
                 {
-                    if (k.index == (int)ConfigHelper.Modifiers)
+                    if (k.Index == (int)ConfigHelper.Modifiers)
                     {
                         return true;
                     }
-                    else
-                    {
-                        return false;
-                    }
+
+                    return false;
                 });
             }
-            ConfigHelper.Modifiers = (HotKeys.HotkeyModifiers)modifiers[cb.SelectedIndex].index;
+
+            ConfigHelper.Modifiers = (HotKeys.HotkeyModifiers)_modifiers[cb.SelectedIndex].Index;
             ConfigHelper.Save();
 
-            if (m_Hwnd != IntPtr.Zero)
+            if (_hWnd != IntPtr.Zero)
             {
                 // 取消注册热键
-                hk.UnRegist(m_Hwnd, tb.ChangeState);
+                _hk.UnRegist(_hWnd, _tb.ChangeState);
                 // 注册热键
-                hk.Regist(this.m_Hwnd, (int)ConfigHelper.Modifiers, ConfigHelper.VKey, tb.ChangeState);
+                _hk.Regist(_hWnd, (int)ConfigHelper.Modifiers, ConfigHelper.VKey, _tb.ChangeState);
             }
         }
 
@@ -177,106 +157,109 @@ namespace Tbh
             ComboBox cb = (ComboBox)sender;
             if (cb.SelectedIndex == -1)
             {
-                cb.SelectedIndex = vkeys.FindIndex((Keys k) =>
+                cb.SelectedIndex = _vkeys.FindIndex(k =>
                 {
-                    if (k.index == (int)ConfigHelper.VKey)
+                    if (k.Index == (int)ConfigHelper.VKey)
                     {
                         return true;
                     }
-                    else
-                    {
-                        return false;
-                    }
+
+                    return false;
                 });
             }
-            ConfigHelper.VKey = (HotKeys.EKey)vkeys[cb.SelectedIndex].index;
+
+            ConfigHelper.VKey = (HotKeys.EKey)_vkeys[cb.SelectedIndex].Index;
             ConfigHelper.Save();
 
-            if (m_Hwnd != IntPtr.Zero)
+            if (_hWnd != IntPtr.Zero)
             {
                 // 取消注册热键
-                hk.UnRegist(m_Hwnd, tb.ChangeState);
+                _hk.UnRegist(_hWnd, _tb.ChangeState);
                 // 注册热键
-                hk.Regist(this.m_Hwnd, (int)ConfigHelper.Modifiers, ConfigHelper.VKey, tb.ChangeState);
+                _hk.Regist(_hWnd, (int)ConfigHelper.Modifiers, ConfigHelper.VKey, _tb.ChangeState);
             }
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
-            if (!this.AboutToClose)
+            if (!AboutToClose)
             {
                 e.Cancel = true;
             }
-            this.Hide();
+
+            Hide();
         }
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            tray.Dispose();
+            _tray.Dispose();
         }
 
         private void ButtonReset_Click(object sender, RoutedEventArgs e)
         {
-            tb.ResetHandle();
-        }
-    }
-    public struct Keys
-    {
-        public int index
-        {
-            get;
-            set;
-        }
-        public string key
-        {
-            get;
-            set;
-        }
-        public override string ToString()
-        {
-            return this.key;
-        }
-        public override bool Equals(object? obj)
-        {
-            if (obj == null)
-            {
-                return false;
-            }
-            return index == ((Keys)obj).index;
-        }
-        public override int GetHashCode()
-        {
-            return index.GetHashCode();
+            _tb.ResetHandle();
         }
     }
 
-    public struct Modifiers
+    public struct Keys : IEquatable<Keys>
     {
-        public int index
-        {
-            get;
-            set;
-        }
-        public string modifier
-        {
-            get;
-            set;
-        }
+        public int Index { get; set; }
+        public string Key { get; set; }
+
         public override string ToString()
         {
-            return this.modifier;
+            return Key;
         }
+
         public override bool Equals(object? obj)
         {
             if (obj == null)
             {
                 return false;
             }
-            return index == ((Modifiers)obj).index;
+
+            return Index == ((Keys)obj).Index;
         }
+
         public override int GetHashCode()
         {
-            return index.GetHashCode();
+            return Index.GetHashCode();
+        }
+
+        public bool Equals(Keys other)
+        {
+            return Index == other.Index && Key == other.Key;
+        }
+    }
+
+    public struct Modifiers : IEquatable<Modifiers>
+    {
+        public int Index { get; set; }
+        public string Modifier { get; set; }
+
+        public override string ToString()
+        {
+            return this.Modifier;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+
+            return Index == ((Modifiers)obj).Index;
+        }
+
+        public override int GetHashCode()
+        {
+            return Index.GetHashCode();
+        }
+
+        public bool Equals(Modifiers other)
+        {
+            return Index == other.Index && Modifier == other.Modifier;
         }
     }
 }

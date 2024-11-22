@@ -2,40 +2,34 @@
 {
     internal class AutoRun
     {
-        private readonly string PROGRAM_NAME;
-        private readonly string fileDir;
-        private const string KEY_PATH = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
-        private readonly Microsoft.Win32.RegistryKey? asKey;
-        public bool RunOnBoot { get; set; }
+        private readonly string _programName;
+        private readonly string _fileDir;
+        private const string KeyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
+        private readonly Microsoft.Win32.RegistryKey? _asKey;
+        public bool RunOnBoot { get; private set; }
 
-        public AutoRun(string programname)
+        public AutoRun(string programName)
         {
-            PROGRAM_NAME = programname;
-            string? processPath = System.Environment.ProcessPath;
-            if (processPath != null)
-            {
-                fileDir = processPath;
-            }
-            else
-            {
-                fileDir = "";
-            }
-            asKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(KEY_PATH, true);
-            if (asKey == null)
+            _programName = programName;
+            _fileDir = System.Environment.ProcessPath ?? "";
+
+            _asKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(KeyPath, true);
+            if (_asKey == null)
             {
                 System.Windows.MessageBox.Show("asKey is null!");
             }
+
             CheckStartupOnBoot();
         }
 
         ~AutoRun()
         {
-            asKey?.Close();
+            _asKey?.Close();
         }
 
-        public void CheckStartupOnBoot()
+        private void CheckStartupOnBoot()
         {
-            RunOnBoot = (asKey?.GetValue(PROGRAM_NAME) != null);
+            RunOnBoot = (_asKey?.GetValue(_programName) != null);
         }
 
         public void SetStartupOnBoot(bool enable)
@@ -46,14 +40,15 @@
                 return;
             }
 
-            if (enable == true)
+            if (enable)
             {
-                asKey?.SetValue(PROGRAM_NAME, fileDir);
+                _asKey?.SetValue(_programName, _fileDir);
             }
             else
             {
-                asKey?.DeleteValue(PROGRAM_NAME);
+                _asKey?.DeleteValue(_programName);
             }
+
             RunOnBoot = enable;
         }
     }

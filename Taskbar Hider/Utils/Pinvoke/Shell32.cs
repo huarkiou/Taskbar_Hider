@@ -43,6 +43,7 @@ namespace Tbh.Utils.Pinvoke
             public int Bottom;
         }
 
+        [Flags]
         public enum AppBarStates
         {
             AutoHide = 0x01,
