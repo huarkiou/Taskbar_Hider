@@ -1,0 +1,14 @@
+﻿FindWindow
+IsWindowVisible
+ShowWindow
+SHOW_WINDOW_CMD
+SHAppBarMessage
+APPBARDATA
+RegisterHotKey
+UnregisterHotKey
+HOT_KEY_MODIFIERS
+VIRTUAL_KEY
+WM_HOTKEY
+GlobalAddAtom
+GlobalFindAtomW
+GlobalDeleteAtom

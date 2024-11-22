@@ -1,55 +1,49 @@
-﻿namespace Tbh
+﻿using System;
+using System.Windows;
+using Microsoft.Win32;
+
+namespace Tbh;
+
+internal class AutoRun
 {
-    internal class AutoRun
+    private const string KeyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
+    private readonly RegistryKey? _asKey;
+    private readonly string _fileDir;
+    private readonly string _programName;
+
+    public AutoRun(string programName)
     {
-        private readonly string _programName;
-        private readonly string _fileDir;
-        private const string KeyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
-        private readonly Microsoft.Win32.RegistryKey? _asKey;
-        public bool RunOnBoot { get; private set; }
+        _programName = programName;
+        _fileDir = Environment.ProcessPath ?? "";
 
-        public AutoRun(string programName)
-        {
-            _programName = programName;
-            _fileDir = System.Environment.ProcessPath ?? "";
+        _asKey = Registry.CurrentUser.OpenSubKey(KeyPath, true);
+        if (_asKey == null) MessageBox.Show("asKey is null!");
 
-            _asKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(KeyPath, true);
-            if (_asKey == null)
-            {
-                System.Windows.MessageBox.Show("asKey is null!");
-            }
+        CheckStartupOnBoot();
+    }
 
-            CheckStartupOnBoot();
-        }
+    public bool RunOnBoot { get; private set; }
 
-        ~AutoRun()
-        {
-            _asKey?.Close();
-        }
+    ~AutoRun()
+    {
+        _asKey?.Close();
+    }
 
-        private void CheckStartupOnBoot()
-        {
-            RunOnBoot = (_asKey?.GetValue(_programName) != null);
-        }
+    private void CheckStartupOnBoot()
+    {
+        RunOnBoot = _asKey?.GetValue(_programName) != null;
+    }
 
-        public void SetStartupOnBoot(bool enable)
-        {
-            CheckStartupOnBoot();
-            if (enable == RunOnBoot)
-            {
-                return;
-            }
+    public void SetStartupOnBoot(bool enable)
+    {
+        CheckStartupOnBoot();
+        if (enable == RunOnBoot) return;
 
-            if (enable)
-            {
-                _asKey?.SetValue(_programName, _fileDir);
-            }
-            else
-            {
-                _asKey?.DeleteValue(_programName);
-            }
+        if (enable)
+            _asKey?.SetValue(_programName, _fileDir);
+        else
+            _asKey?.DeleteValue(_programName);
 
-            RunOnBoot = enable;
-        }
+        RunOnBoot = enable;
     }
 }

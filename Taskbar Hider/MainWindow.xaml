@@ -24,11 +24,13 @@
         <Label x:Name="LabelAn" Content="按" Grid.Row="0" Grid.Column="0" FontSize="14" FontStyle="Normal"
                FontWeight="Normal" VerticalAlignment="Center" />
         <ComboBox x:Name="ModifiersComboBox" Grid.Row="0" Grid.Column="1" IsReadOnly="True"
-                  SelectionChanged="Modifiers_comboBox_SelectionChanged" VerticalAlignment="Center" />
+                  SelectionChanged="Modifiers_comboBox_SelectionChanged" VerticalAlignment="Center"
+                  HorizontalContentAlignment="Center" />
         <Label x:Name="LabelPlus" Content="+" Grid.Row="0" Grid.Column="2" FontSize="16" FontStyle="Normal"
                FontWeight="Normal" VerticalAlignment="Center" />
         <ComboBox x:Name="VKeyComboBox" Grid.Row="0" Grid.Column="3" IsReadOnly="True"
-                  SelectionChanged="VKey_comboBox_SelectionChanged" VerticalAlignment="Center" />
+                  SelectionChanged="VKey_comboBox_SelectionChanged" VerticalAlignment="Center"
+                  HorizontalContentAlignment="Center" />
         <Label x:Name="LabelFunc" Content="来显示/隐藏任务栏" Grid.Row="0" Grid.Column="4" FontSize="14" FontStyle="Normal"
                FontWeight="Normal" VerticalAlignment="Center" />
 

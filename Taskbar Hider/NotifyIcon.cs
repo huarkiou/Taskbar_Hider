@@ -2,79 +2,69 @@
 using System.Drawing;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Forms;
+using MessageBox = System.Windows.MessageBox;
 
-namespace Tbh
+namespace Tbh;
+
+internal class NotifyIcon
 {
-    internal class NotifyIcon
+    private readonly MainWindow _mainWindow;
+    private readonly System.Windows.Forms.NotifyIcon _notifyIcon;
+
+    public NotifyIcon(MainWindow win)
     {
-        private readonly System.Windows.Forms.NotifyIcon _notifyicon;
-        private readonly MainWindow _mainwindow;
+        _mainWindow = win;
+        // 初始化托盘菜单
+        _notifyIcon = new System.Windows.Forms.NotifyIcon();
 
-        public NotifyIcon(MainWindow win)
+        // 导入嵌入的资源
+        var name = MethodBase.GetCurrentMethod()?.DeclaringType?.Namespace + ".Resources.Icon_MainWindow.ico";
+        var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(name);
+        if (stream == null)
         {
-            _mainwindow = win;
-            // 初始化托盘菜单
-            _notifyicon = new System.Windows.Forms.NotifyIcon();
-
-            // 导入资源
-            //Uri uri = new(@"Resources\Icon_MainWindow.ico", UriKind.Relative);
-            //System.Windows.Resources.StreamResourceInfo info = Application.GetResourceStream(uri);
-            //notifyicon.Icon = new Icon(info.Stream);
-
-            // 导入嵌入的资源
-            //MessageBox.Show(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name + ".Resources.Icon_MainWindow.ico");
-            var name = MethodBase.GetCurrentMethod()?.DeclaringType?.Namespace + ".Resources.Icon_MainWindow.ico";
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            System.IO.Stream? stream = assembly.GetManifestResourceStream(name);
-            //var list = assembly.GetManifestResourceNames();
-            //foreach (string item in list) {
-            //    MessageBox.Show(item);
-            //}
-            if (stream == null)
-            {
-                MessageBox.Show("Cannot file notifyicon", "Error", MessageBoxButton.OKCancel);
-                Environment.Exit(-1);
-            }
-            else
-            {
-                _notifyicon.Icon = new Icon(stream);
-            }
-
-            _notifyicon.Text = "Taskbar Hider";
-            _notifyicon.DoubleClick += Show_Clicked;
-            _notifyicon.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
-            _notifyicon.ContextMenuStrip.Items.Add("显示/隐藏", null, Show_Clicked);
-            _notifyicon.ContextMenuStrip.Items.Add("退出", null, Quit_Clicked);
-            _notifyicon.Visible = true;
+            MessageBox.Show("Cannot file notifyicon", "Error", MessageBoxButton.OKCancel);
+            Environment.Exit(-1);
+        }
+        else
+        {
+            _notifyIcon.Icon = new Icon(stream);
         }
 
-        ~NotifyIcon()
-        {
-            Dispose();
-        }
+        _notifyIcon.Text = "Taskbar Hider";
+        _notifyIcon.DoubleClick += Show_Clicked;
+        _notifyIcon.ContextMenuStrip = new ContextMenuStrip();
+        _notifyIcon.ContextMenuStrip.Items.Add("显示/隐藏", null, Show_Clicked);
+        _notifyIcon.ContextMenuStrip.Items.Add("退出", null, Quit_Clicked);
+        _notifyIcon.Visible = true;
+    }
 
-        public void Dispose()
-        {
-            _notifyicon.Dispose();
-        }
+    ~NotifyIcon()
+    {
+        Dispose();
+    }
 
-        private void Quit_Clicked(Object? sender, EventArgs e)
-        {
-            _mainwindow.AboutToClose = true;
-            _mainwindow.Close();
-        }
+    public void Dispose()
+    {
+        _notifyIcon.Dispose();
+    }
 
-        private void Show_Clicked(Object? sender, EventArgs e)
+    private void Quit_Clicked(object? sender, EventArgs e)
+    {
+        _mainWindow.AboutToClose = true;
+        _mainWindow.Close();
+    }
+
+    private void Show_Clicked(object? sender, EventArgs e)
+    {
+        if (_mainWindow.IsVisible)
         {
-            if (_mainwindow.IsVisible)
-            {
-                _mainwindow.Hide();
-            }
-            else
-            {
-                _mainwindow.Show();
-                _mainwindow.Activate();
-            }
+            _mainWindow.Hide();
+        }
+        else
+        {
+            _mainWindow.Show();
+            _mainWindow.Activate();
         }
     }
 }
