@@ -27,7 +27,7 @@ public partial class MainWindow : Window
         {
             if (_showFirstTime)
             {
-                Hide();
+                Hide(); // 这会导致设计器中窗口隐藏
                 _showFirstTime = false;
             }
         };
