@@ -19,8 +19,18 @@ public partial class MainWindow : Window
 
     private readonly HWND _hWnd; // MainWindow句柄
 
+    private bool _showFirstTime = true;
+
     public MainWindow()
     {
+        Opened += (_, _) =>
+        {
+            if (_showFirstTime)
+            {
+                Hide();
+                _showFirstTime = false;
+            }
+        };
         InitializeComponent();
         _hWnd = new HWND(TryGetPlatformHandle()?.Handle ?? IntPtr.Zero);
         _tb = new Taskbar
@@ -69,14 +79,15 @@ public partial class MainWindow : Window
         if (cb.SelectedIndex == -1)
             cb.SelectedIndex = _modifiers.FindIndex(k => k.Index == (int)AppConfiguration.Instance.Config.Modifiers);
 
-        AppConfiguration.Instance.Config.Modifiers = (HOT_KEY_MODIFIERS)_modifiers[cb.SelectedIndex].Index;
+        AppConfiguration.Instance.Config.Modifiers = (uint)_modifiers[cb.SelectedIndex].Index;
         AppConfiguration.Instance.Save();
 
         if (_hWnd == HWND.Null) return;
         // 取消注册热键
         _hk.Unregister(_hWnd, _tb.ChangeState);
         // 注册热键
-        _hk.Register(_hWnd, AppConfiguration.Instance.Config.Modifiers, AppConfiguration.Instance.Config.VKey,
+        _hk.Register(_hWnd, (HOT_KEY_MODIFIERS)AppConfiguration.Instance.Config.Modifiers,
+            (VIRTUAL_KEY)AppConfiguration.Instance.Config.VKey,
             _tb.ChangeState);
     }
 
@@ -86,7 +97,7 @@ public partial class MainWindow : Window
         if (cb.SelectedIndex == -1)
             cb.SelectedIndex = _vKeys.FindIndex(k => k.Index == (int)AppConfiguration.Instance.Config.VKey);
 
-        AppConfiguration.Instance.Config.VKey = (VIRTUAL_KEY)_vKeys[cb.SelectedIndex].Index;
+        AppConfiguration.Instance.Config.VKey = (uint)_vKeys[cb.SelectedIndex].Index;
         AppConfiguration.Instance.Save();
 
         if (_hWnd != HWND.Null)
@@ -94,16 +105,17 @@ public partial class MainWindow : Window
             // 取消注册热键
             _hk.Unregister(_hWnd, _tb.ChangeState);
             // 注册热键
-            _hk.Register(_hWnd, AppConfiguration.Instance.Config.Modifiers, AppConfiguration.Instance.Config.VKey,
+            _hk.Register(_hWnd, (HOT_KEY_MODIFIERS)AppConfiguration.Instance.Config.Modifiers,
+                (VIRTUAL_KEY)AppConfiguration.Instance.Config.VKey,
                 _tb.ChangeState);
         }
     }
 }
 
-public struct Keys : IEquatable<Keys>
+public readonly struct Keys : IEquatable<Keys>
 {
-    public int Index { get; set; }
-    public string Name { get; set; }
+    public int Index { get; init; }
+    public string Name { get; init; }
 
     public override string ToString()
     {
@@ -138,10 +150,10 @@ public struct Keys : IEquatable<Keys>
     }
 }
 
-public struct Modifiers : IEquatable<Modifiers>
+public readonly struct Modifiers : IEquatable<Modifiers>
 {
-    public int Index { get; set; }
-    public string Name { get; set; }
+    public int Index { get; init; }
+    public string Name { get; init; }
 
     public override string ToString()
     {

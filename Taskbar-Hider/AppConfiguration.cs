@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace Taskbar_Hider_Avalonia;
@@ -11,31 +12,34 @@ internal struct Configuration
     {
     }
 
-    public HOT_KEY_MODIFIERS Modifiers { get; set; } = HOT_KEY_MODIFIERS.MOD_ALT;
-    public VIRTUAL_KEY VKey { get; set; } = VIRTUAL_KEY.VK_F2;
+    public uint Modifiers { get; set; } = (uint)HOT_KEY_MODIFIERS.MOD_ALT;
+    public uint VKey { get; set; } = (uint)VIRTUAL_KEY.VK_F2;
     public bool ShowTaskbarOnStartup { get; set; } = true;
 }
+
+[JsonSerializable(typeof(Configuration))]
+[JsonSourceGenerationOptions(WriteIndented = true)]
+internal partial class ConfigurationContext : JsonSerializerContext;
 
 internal class AppConfiguration
 {
     private static readonly string ConfigPath =
         Path.GetDirectoryName(Environment.ProcessPath) + @"/" + App.ProgramName + ".json";
 
-    private static readonly JsonSerializerOptions Option = new() { WriteIndented = true };
-
     public Configuration Config = new();
 
     private AppConfiguration()
     {
         if (!File.Exists(ConfigPath)) return;
-        Config = JsonSerializer.Deserialize<Configuration>(File.ReadAllText(ConfigPath));
+        Config = JsonSerializer.Deserialize(
+            File.ReadAllText(ConfigPath), ConfigurationContext.Default.Configuration);
     }
 
     public static AppConfiguration Instance { get; } = new();
 
     public void Save()
     {
-        File.WriteAllText(ConfigPath,
-            JsonSerializer.Serialize(this, Option));
+        File.WriteAllText(ConfigPath, JsonSerializer.Serialize(
+            Config, typeof(Configuration), ConfigurationContext.Default));
     }
 }

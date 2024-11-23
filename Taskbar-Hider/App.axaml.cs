@@ -22,21 +22,21 @@ public class App : Application
         var mutex = new Mutex(true, "Global\\" + ProgramName, out var createdNew);
         if (!createdNew) return;
         mutex.ReleaseMutex();
+        desktop.ShutdownMode = ShutdownMode.OnLastWindowClose;
         desktop.MainWindow = new MainWindow();
-        desktop.MainWindow.Closing += CancelAndHideWindow;
-    }
+        desktop.MainWindow.Closing += (sender, eventArgs) =>
+        {
+            ((Window)sender!).Hide();
+            eventArgs.Cancel = true;
+        };
 
-    private static void CancelAndHideWindow(object? sender, WindowClosingEventArgs eventArgs)
-    {
-        ((Window)sender!).Hide();
-        eventArgs.Cancel = true;
+        base.OnFrameworkInitializationCompleted();
     }
 
     private void Quit_OnClick(object? sender, EventArgs e)
     {
         if (ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop) return;
-        desktop.MainWindow!.Closing -= CancelAndHideWindow;
-        desktop.MainWindow!.Close();
+        desktop.Shutdown();
     }
 
     private void ChangeVisible_OnClick(object? sender, EventArgs e)
