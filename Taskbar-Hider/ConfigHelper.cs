@@ -26,6 +26,7 @@ internal static class ConfigHelper
 
     public static void Save()
     {
-        File.WriteAllText(ConfigPath, JsonSerializer.Serialize(Config));
+        File.WriteAllText(ConfigPath,
+            JsonSerializer.Serialize(Config, new JsonSerializerOptions { WriteIndented = true }));
     }
 }
