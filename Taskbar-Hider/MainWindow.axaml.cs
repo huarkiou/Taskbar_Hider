@@ -1,20 +1,20 @@
 using System;
 using System.Collections.Generic;
 using Windows.Win32.Foundation;
-using Avalonia.Controls;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
+using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Tbh;
 
 namespace Taskbar_Hider_Avalonia;
 
 public partial class MainWindow : Window
 {
-    private readonly List<Modifiers> _modifiers;
-    private readonly List<Keys> _vKeys;
     private readonly AutoRun _autorun;
     private readonly HotKeys _hk;
     private readonly Taskbar _tb;
+
+    private readonly List<Modifiers> _modifiers;
+    private readonly List<Keys> _vKeys;
 
     private readonly HWND _hWnd; // MainWindow句柄
 
@@ -24,7 +24,7 @@ public partial class MainWindow : Window
 
         _tb = new Taskbar
         {
-            Visibility = ConfigHelper.Config.ShowTaskbarOnStartup
+            Visibility = AppConfiguration.Instance.Config.ShowTaskbarOnStartup
         };
         _hk = new HotKeys();
         _autorun = new AutoRun(App.ProgramName);
@@ -32,7 +32,7 @@ public partial class MainWindow : Window
         // 注册热键
         Win32Properties.AddWndProcHookCallback(this, _hk.OnHotkey);
         _hWnd = new HWND(TryGetPlatformHandle()?.Handle ?? IntPtr.Zero);
-        // _hk.Register(_hWnd, ConfigHelper.Config.Modifiers, ConfigHelper.Config.VKey, _tb.ChangeState);
+        // _hk.Register(_hWnd, ConfigHelper.Instance.Modifiers, ConfigHelper.Instance.VKey, _tb.ChangeState);
 
         _vKeys = [];
         var tmp = new Keys();
@@ -47,7 +47,7 @@ public partial class MainWindow : Window
         }
 
         VirtualKeyComboBox.ItemsSource = _vKeys;
-        VirtualKeyComboBox.SelectedIndex = _vKeys.FindIndex(k => k.Index == (int)ConfigHelper.Config.VKey);
+        VirtualKeyComboBox.SelectedIndex = _vKeys.FindIndex(k => k.Index == (int)AppConfiguration.Instance.Config.VKey);
 
         _modifiers = [];
         var tmp2 = new Modifiers();
@@ -62,7 +62,8 @@ public partial class MainWindow : Window
         }
 
         ModifierComboBox.ItemsSource = _modifiers;
-        ModifierComboBox.SelectedIndex = _modifiers.FindIndex(k => k.Index == (int)ConfigHelper.Config.Modifiers);
+        ModifierComboBox.SelectedIndex =
+            _modifiers.FindIndex(k => k.Index == (int)AppConfiguration.Instance.Config.Modifiers);
 
         AutoRunCheckBox.IsChecked = _autorun.RunOnBoot;
     }
@@ -87,32 +88,35 @@ public partial class MainWindow : Window
     {
         var cb = sender as ComboBox ?? throw new NullReferenceException();
         if (cb.SelectedIndex == -1)
-            cb.SelectedIndex = _modifiers.FindIndex(k => k.Index == (int)ConfigHelper.Config.Modifiers);
+            cb.SelectedIndex = _modifiers.FindIndex(k => k.Index == (int)AppConfiguration.Instance.Config.Modifiers);
 
-        ConfigHelper.Config.Modifiers = (HOT_KEY_MODIFIERS)_modifiers[cb.SelectedIndex].Index;
-        ConfigHelper.Save();
+        AppConfiguration.Instance.Config.Modifiers = (HOT_KEY_MODIFIERS)_modifiers[cb.SelectedIndex].Index;
+        AppConfiguration.Instance.Save();
 
         if (_hWnd == HWND.Null) return;
         // 取消注册热键
         _hk.Unregister(_hWnd, _tb.ChangeState);
         // 注册热键
-        _hk.Register(_hWnd, ConfigHelper.Config.Modifiers, ConfigHelper.Config.VKey, _tb.ChangeState);
+        _hk.Register(_hWnd, AppConfiguration.Instance.Config.Modifiers, AppConfiguration.Instance.Config.VKey,
+            _tb.ChangeState);
     }
 
     private void VirtualKeyComboBox_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         var cb = sender as ComboBox ?? throw new NullReferenceException();
-        if (cb.SelectedIndex == -1) cb.SelectedIndex = _vKeys.FindIndex(k => k.Index == (int)ConfigHelper.Config.VKey);
+        if (cb.SelectedIndex == -1)
+            cb.SelectedIndex = _vKeys.FindIndex(k => k.Index == (int)AppConfiguration.Instance.Config.VKey);
 
-        ConfigHelper.Config.VKey = (VIRTUAL_KEY)_vKeys[cb.SelectedIndex].Index;
-        ConfigHelper.Save();
+        AppConfiguration.Instance.Config.VKey = (VIRTUAL_KEY)_vKeys[cb.SelectedIndex].Index;
+        AppConfiguration.Instance.Save();
 
         if (_hWnd != HWND.Null)
         {
             // 取消注册热键
             _hk.Unregister(_hWnd, _tb.ChangeState);
             // 注册热键
-            _hk.Register(_hWnd, ConfigHelper.Config.Modifiers, ConfigHelper.Config.VKey, _tb.ChangeState);
+            _hk.Register(_hWnd, AppConfiguration.Instance.Config.Modifiers, AppConfiguration.Instance.Config.VKey,
+                _tb.ChangeState);
         }
     }
 }

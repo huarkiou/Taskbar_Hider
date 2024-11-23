@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Windows;
 using Microsoft.Win32;
 
-namespace Tbh;
+namespace Taskbar_Hider_Avalonia;
 
 internal class AutoRun
 {
@@ -17,7 +16,7 @@ internal class AutoRun
         _fileDir = Environment.ProcessPath ?? "";
 
         _asKey = Registry.CurrentUser.OpenSubKey(KeyPath, true);
-        if (_asKey == null) MessageBox.Show("asKey is null!");
+        if (_asKey == null) throw new InvalidOperationException();
 
         CheckStartupOnBoot();
     }

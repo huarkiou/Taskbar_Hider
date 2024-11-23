@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="440" d:DesignHeight="330"
         x:Class="Taskbar_Hider_Avalonia.MainWindow"
-        Icon="avares://Taskbar-Hider-Avalonia/Assets/appLogo.ico"
+        Icon="avares://Taskbar-Hider/Assets/appLogo.ico"
         Title="Taskbar Hider"
         Width="440" Height="280"
         MinWidth="400" MinHeight="180"
@@ -18,15 +18,15 @@
                HorizontalContentAlignment="Right" />
         <ComboBox x:Name="ModifierComboBox" Grid.Row="0" Grid.Column="1"
                   VerticalAlignment="Center" HorizontalAlignment="Center"
-                  HorizontalContentAlignment="Center" 
-                  SelectionChanged="ModifierComboBox_OnSelectionChanged"/>
+                  HorizontalContentAlignment="Center"
+                  SelectionChanged="ModifierComboBox_OnSelectionChanged" />
         <Label Content="+" Grid.Row="0" Grid.Column="2"
                VerticalAlignment="Center" HorizontalAlignment="Center"
                HorizontalContentAlignment="Center" />
         <ComboBox x:Name="VirtualKeyComboBox" Grid.Row="0" Grid.Column="3"
                   VerticalAlignment="Center" HorizontalAlignment="Center"
-                  HorizontalContentAlignment="Center" 
-                  SelectionChanged="VirtualKeyComboBox_OnSelectionChanged"/>
+                  HorizontalContentAlignment="Center"
+                  SelectionChanged="VirtualKeyComboBox_OnSelectionChanged" />
         <Label Content="来显示/隐藏任务栏" Grid.Row="0" Grid.Column="4"
                VerticalAlignment="Center" HorizontalAlignment="Left"
                HorizontalContentAlignment="Left" />

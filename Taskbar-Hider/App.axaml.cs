@@ -4,11 +4,10 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using Tbh;
 
 namespace Taskbar_Hider_Avalonia;
 
-public partial class App : Application
+public class App : Application
 {
     public const string ProgramName = "Taskbar-Hider";
 
@@ -19,21 +18,12 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-        {
-            var mutex = new Mutex(true, "Global\\" + ProgramName, out var createdNew);
-            if (createdNew)
-            {
-                mutex.ReleaseMutex();
-                ConfigHelper.Load();
-                desktop.MainWindow = new MainWindow();
-                desktop.MainWindow.Closing += CancelAndHideWindow;
-            }
-            else
-            {
-                // MessageBox.Show("已启动一个" + ProgramName + "实例,不必重复启动。");
-            }
-        }
+        if (ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop) return;
+        var mutex = new Mutex(true, "Global\\" + ProgramName, out var createdNew);
+        if (!createdNew) return;
+        mutex.ReleaseMutex();
+        desktop.MainWindow = new MainWindow();
+        desktop.MainWindow.Closing += CancelAndHideWindow;
     }
 
     private static void CancelAndHideWindow(object? sender, WindowClosingEventArgs eventArgs)
@@ -53,12 +43,8 @@ public partial class App : Application
     {
         if (ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop) return;
         if (desktop.MainWindow!.IsVisible)
-        {
             desktop.MainWindow!.Hide();
-        }
         else
-        {
             desktop.MainWindow!.Show();
-        }
     }
 }

@@ -5,7 +5,7 @@ using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
-namespace Tbh;
+namespace Taskbar_Hider_Avalonia;
 
 public class HotKeys
 {
@@ -52,7 +52,7 @@ public class HotKeys
     /// <param name="longParam">附加参数2</param>
     /// <param name="handled">是否处理</param>
     /// <returns>返回句柄</returns>
-    public IntPtr OnHotkey(IntPtr hWnd, int msg, IntPtr wideParam, IntPtr longParam, ref bool handled)
+    public IntPtr OnHotkey(IntPtr hWnd, uint msg, IntPtr wideParam, IntPtr longParam, ref bool handled)
     {
         switch (msg)
         {

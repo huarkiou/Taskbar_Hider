@@ -1,7 +1,8 @@
-﻿/Taskbar Hider/bin
-/Taskbar Hider/obj
-/Taskbar Hider/Properties
-/Taskbar Hider/Taskbar_Hider.csproj.user
-/.vs
-/Backup
+﻿*/bin
+*/obj
+*/Properties
+*.user
+.vs
+.idea
+Backup
 UpgradeLog.htm

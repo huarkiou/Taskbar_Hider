@@ -2,13 +2,13 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Windows.Threading;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Shell;
 using Windows.Win32.UI.WindowsAndMessaging;
+using Avalonia.Threading;
 
-namespace Tbh;
+namespace Taskbar_Hider_Avalonia;
 
 internal class Taskbar
 {
@@ -52,35 +52,20 @@ internal class Taskbar
 
     private void OnTimerHandler(object? sender, EventArgs e)
     {
-        if (IsVisible())
-            if (PInvoke.IsWindowVisible(HWnd) != Visibility)
-                IsVisible();
+        if (PInvoke.IsWindowVisible(HWnd) == Visibility) Show(Visibility);
     }
 
-    private bool IsVisible()
-    {
-        if (PInvoke.IsWindowVisible(HWnd) != Visibility)
-        {
-            SetTaskbarState(Visibility);
-            Show(Visibility);
-        }
-
-        return PInvoke.IsWindowVisible(HWnd) == Visibility;
-    }
 
     public void ResetHandle()
     {
-        HWnd = HWND.Null;
         HWnd = PInvoke.FindWindow("System_TrayWnd", null);
-        if (HWnd == HWND.Null)
+        if (HWnd != HWND.Null) return;
+        Stopwatch sw = new();
+        sw.Start();
+        while (HWnd == HWND.Null)
         {
-            Stopwatch sw = new();
-            sw.Start();
-            while (HWnd == HWND.Null)
-            {
-                HWnd = PInvoke.FindWindow("Shell_TrayWnd", null);
-                if (sw.Elapsed == new TimeSpan(0, 0, 5)) throw new Exception("找不到任务栏句柄");
-            }
+            HWnd = PInvoke.FindWindow("Shell_TrayWnd", null);
+            if (sw.Elapsed == new TimeSpan(0, 0, 5)) throw new Exception("找不到任务栏句柄");
         }
     }
 
@@ -101,7 +86,7 @@ internal class Taskbar
         Thread.Sleep(80);
         Show(Visibility);
 
-        ConfigHelper.Config.ShowTaskbarOnStartup = Visibility;
+        AppConfiguration.Instance.Config.ShowTaskbarOnStartup = Visibility;
     }
 
     /// <summary>

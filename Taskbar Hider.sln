@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taskbar-Hider", "Taskbar-Hider\Taskbar-Hider.csproj", "{666B00B2-68F2-4D7C-9FD9-044F04CC5FF4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taskbar-Hider", "Taskbar-Hider\Taskbar-Hider.csproj", "{1653CCE3-5BE9-4D7B-9BC1-F77B4F19D44E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{666B00B2-68F2-4D7C-9FD9-044F04CC5FF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{666B00B2-68F2-4D7C-9FD9-044F04CC5FF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{666B00B2-68F2-4D7C-9FD9-044F04CC5FF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{666B00B2-68F2-4D7C-9FD9-044F04CC5FF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1653CCE3-5BE9-4D7B-9BC1-F77B4F19D44E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1653CCE3-5BE9-4D7B-9BC1-F77B4F19D44E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1653CCE3-5BE9-4D7B-9BC1-F77B4F19D44E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1653CCE3-5BE9-4D7B-9BC1-F77B4F19D44E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
