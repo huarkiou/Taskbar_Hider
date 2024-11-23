@@ -1,0 +1,42 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="440" d:DesignHeight="330"
+        x:Class="Taskbar_Hider_Avalonia.MainWindow"
+        Icon="avares://Taskbar-Hider-Avalonia/Assets/appLogo.ico"
+        Title="Taskbar Hider"
+        Width="440" Height="280"
+        MinWidth="400" MinHeight="180"
+        WindowStartupLocation="CenterScreen"
+        HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+
+    <Grid ColumnDefinitions="30, 80, 25, 100, 130" RowDefinitions="120, Auto"
+          Margin="20,10,10,10" ShowGridLines="True">
+        <Label Content="按" Grid.Row="0" Grid.Column="0"
+               VerticalAlignment="Center" HorizontalAlignment="Right"
+               HorizontalContentAlignment="Right" />
+        <ComboBox x:Name="ModifierComboBox" Grid.Row="0" Grid.Column="1"
+                  VerticalAlignment="Center" HorizontalAlignment="Center"
+                  HorizontalContentAlignment="Center" 
+                  SelectionChanged="ModifierComboBox_OnSelectionChanged"/>
+        <Label Content="+" Grid.Row="0" Grid.Column="2"
+               VerticalAlignment="Center" HorizontalAlignment="Center"
+               HorizontalContentAlignment="Center" />
+        <ComboBox x:Name="VirtualKeyComboBox" Grid.Row="0" Grid.Column="3"
+                  VerticalAlignment="Center" HorizontalAlignment="Center"
+                  HorizontalContentAlignment="Center" 
+                  SelectionChanged="VirtualKeyComboBox_OnSelectionChanged"/>
+        <Label Content="来显示/隐藏任务栏" Grid.Row="0" Grid.Column="4"
+               VerticalAlignment="Center" HorizontalAlignment="Left"
+               HorizontalContentAlignment="Left" />
+
+        <Button x:Name="ResetButton" Grid.Row="1" Grid.Column="1" Content="重置句柄"
+                VerticalAlignment="Center" HorizontalAlignment="Center"
+                Click="ResetButton_OnClick" />
+        <CheckBox x:Name="AutoRunCheckBox" Grid.Row="1" Grid.Column="3" Content="开机自启动" Cursor="Hand"
+                  VerticalAlignment="Center" HorizontalAlignment="Center"
+                  Click="AutoRunCheckBox_OnClick" />
+    </Grid>
+
+</Window>
