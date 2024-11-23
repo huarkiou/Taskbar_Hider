@@ -1,5 +1,6 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Avalonia.Controls;
@@ -13,59 +14,37 @@ public partial class MainWindow : Window
     private readonly HotKeys _hk;
     private readonly Taskbar _tb;
 
-    private readonly List<Modifiers> _modifiers;
-    private readonly List<Keys> _vKeys;
+    private readonly ImmutableList<Modifiers> _modifiers;
+    private readonly ImmutableList<Keys> _vKeys;
 
     private readonly HWND _hWnd; // MainWindow句柄
 
     public MainWindow()
     {
         InitializeComponent();
-
+        _hWnd = new HWND(TryGetPlatformHandle()?.Handle ?? IntPtr.Zero);
         _tb = new Taskbar
         {
             Visibility = AppConfiguration.Instance.Config.ShowTaskbarOnStartup
         };
         _hk = new HotKeys();
+        Win32Properties.AddWndProcHookCallback(this, _hk.OnHotkey);
         _autorun = new AutoRun(App.ProgramName);
 
-        // 注册热键
-        Win32Properties.AddWndProcHookCallback(this, _hk.OnHotkey);
-        _hWnd = new HWND(TryGetPlatformHandle()?.Handle ?? IntPtr.Zero);
-        // _hk.Register(_hWnd, ConfigHelper.Instance.Modifiers, ConfigHelper.Instance.VKey, _tb.ChangeState);
+        AutoRunCheckBox.IsChecked = _autorun.RunOnBoot;
 
-        _vKeys = [];
-        var tmp = new Keys();
-        foreach (var virtualKey in Enum.GetValues<VIRTUAL_KEY>())
-        {
-            tmp.Index = (int)virtualKey;
-            var name = Enum.GetName(virtualKey);
-            if (name == null) continue;
-
-            tmp.Name = name;
-            if (!_vKeys.Contains(tmp)) _vKeys.Add(tmp);
-        }
-
+        _vKeys = Enum.GetValues<VIRTUAL_KEY>()
+            .Select(m => new Keys() { Index = (int)m, Name = Enum.GetName(m)! })
+            .ToImmutableList();
         VirtualKeyComboBox.ItemsSource = _vKeys;
         VirtualKeyComboBox.SelectedIndex = _vKeys.FindIndex(k => k.Index == (int)AppConfiguration.Instance.Config.VKey);
 
-        _modifiers = [];
-        var tmp2 = new Modifiers();
-        foreach (var modifier in Enum.GetValues<HOT_KEY_MODIFIERS>())
-        {
-            tmp2.Index = (int)modifier;
-            var name = Enum.GetName(modifier);
-            if (name == null) continue;
-
-            tmp2.Name = name;
-            if (!_modifiers.Contains(tmp2)) _modifiers.Add(tmp2);
-        }
-
+        _modifiers = Enum.GetValues<HOT_KEY_MODIFIERS>()
+            .Select(m => new Modifiers() { Index = (int)m, Name = Enum.GetName(m)! })
+            .ToImmutableList();
         ModifierComboBox.ItemsSource = _modifiers;
         ModifierComboBox.SelectedIndex =
             _modifiers.FindIndex(k => k.Index == (int)AppConfiguration.Instance.Config.Modifiers);
-
-        AutoRunCheckBox.IsChecked = _autorun.RunOnBoot;
     }
 
     ~MainWindow()

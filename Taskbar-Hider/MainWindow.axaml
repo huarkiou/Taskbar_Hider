@@ -12,7 +12,7 @@
         HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
 
     <Grid ColumnDefinitions="30, 80, 25, 100, 130" RowDefinitions="120, Auto"
-          Margin="20,10,10,10" ShowGridLines="True">
+          Margin="20,10,10,10">
         <Label Content="按" Grid.Row="0" Grid.Column="0"
                VerticalAlignment="Center" HorizontalAlignment="Right"
                HorizontalContentAlignment="Right" />
