@@ -1,4 +1,5 @@
 ﻿FindWindow
+IsWindow
 IsWindowVisible
 ShowWindow
 SHOW_WINDOW_CMD
