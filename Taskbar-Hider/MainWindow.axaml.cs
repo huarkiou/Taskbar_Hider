@@ -14,12 +14,11 @@ public partial class MainWindow : Window
     private readonly HotKeys _hk;
     private readonly Taskbar _tb;
 
-    private readonly ImmutableList<Modifiers> _modifiers;
-    private readonly ImmutableList<Keys> _vKeys;
-
     private readonly HWND _hWnd; // MainWindow句柄 不为HWND.Null
-
     private bool _showFirstTime = true;
+
+    private readonly ImmutableSortedDictionary<uint, string> _vKeys;
+    private readonly ImmutableSortedDictionary<uint, string> _modifiers;
 
     public MainWindow()
     {
@@ -41,17 +40,15 @@ public partial class MainWindow : Window
         AutoRunToggleSwitch.IsChecked = _autorun.RunOnBoot;
 
         _vKeys = Enum.GetValues<VIRTUAL_KEY>()
-            .Select(m => new Keys() { Index = (int)m, Name = Enum.GetName(m)! })
-            .ToImmutableList();
-        VirtualKeyComboBox.ItemsSource = _vKeys;
-        VirtualKeyComboBox.SelectedIndex = _vKeys.FindIndex(k => k.Index == (int)AppConfiguration.Instance.Config.VKey);
+            .ToImmutableSortedDictionary(m => (uint)m, m => Enum.GetName(m)![3..]);
+
+        VirtualKeyComboBox.ItemsSource = _vKeys.Values;
+        VirtualKeyComboBox.SelectedValue = _vKeys[AppConfiguration.Instance.Config.VKey];
 
         _modifiers = Enum.GetValues<HOT_KEY_MODIFIERS>()
-            .Select(m => new Modifiers() { Index = (int)m, Name = Enum.GetName(m)! })
-            .ToImmutableList();
-        ModifierComboBox.ItemsSource = _modifiers;
-        ModifierComboBox.SelectedIndex =
-            _modifiers.FindIndex(k => k.Index == (int)AppConfiguration.Instance.Config.Modifiers);
+            .ToImmutableSortedDictionary(m => (uint)m, m => Enum.GetName(m)![4..]);
+        ModifierComboBox.ItemsSource = _modifiers.Values;
+        ModifierComboBox.SelectedValue = _modifiers[AppConfiguration.Instance.Config.Modifiers];
     }
 
     ~MainWindow()
@@ -68,10 +65,9 @@ public partial class MainWindow : Window
     private void ModifierComboBox_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         var cb = sender as ComboBox ?? throw new NullReferenceException();
-        if (cb.SelectedIndex == -1)
-            cb.SelectedIndex = _modifiers.FindIndex(k => k.Index == (int)AppConfiguration.Instance.Config.Modifiers);
 
-        AppConfiguration.Instance.Config.Modifiers = (uint)_modifiers[cb.SelectedIndex].Index;
+        AppConfiguration.Instance.Config.Modifiers = _modifiers.Where(v => v.Value == cb.SelectedItem!.ToString())
+            .Select(v => v.Key).ToArray().First();
         AppConfiguration.Instance.Save();
 
         // 取消注册热键
@@ -85,10 +81,9 @@ public partial class MainWindow : Window
     private void VirtualKeyComboBox_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         var cb = sender as ComboBox ?? throw new NullReferenceException();
-        if (cb.SelectedIndex == -1)
-            cb.SelectedIndex = _vKeys.FindIndex(k => k.Index == (int)AppConfiguration.Instance.Config.VKey);
 
-        AppConfiguration.Instance.Config.VKey = (uint)_vKeys[cb.SelectedIndex].Index;
+        AppConfiguration.Instance.Config.VKey = _vKeys.Where(v => v.Value == cb.SelectedItem!.ToString())
+            .Select(v => v.Key).ToArray().First();
         AppConfiguration.Instance.Save();
 
         // 取消注册热键
@@ -97,81 +92,5 @@ public partial class MainWindow : Window
         _hk.Register(_hWnd, (HOT_KEY_MODIFIERS)AppConfiguration.Instance.Config.Modifiers,
             (VIRTUAL_KEY)AppConfiguration.Instance.Config.VKey,
             _tb.ChangeState);
-    }
-}
-
-public readonly struct Keys : IEquatable<Keys>
-{
-    public int Index { get; init; }
-    public string Name { get; init; }
-
-    public override string ToString()
-    {
-        return Name[3..];
-    }
-
-    public override bool Equals(object? obj)
-    {
-        if (obj == null) return false;
-
-        return Index == ((Keys)obj).Index;
-    }
-
-    public override int GetHashCode()
-    {
-        return Index.GetHashCode();
-    }
-
-    public bool Equals(Keys other)
-    {
-        return Index == other.Index && Name == other.Name;
-    }
-
-    public static bool operator ==(Keys left, Keys right)
-    {
-        return left.Equals(right);
-    }
-
-    public static bool operator !=(Keys left, Keys right)
-    {
-        return !(left == right);
-    }
-}
-
-public readonly struct Modifiers : IEquatable<Modifiers>
-{
-    public int Index { get; init; }
-    public string Name { get; init; }
-
-    public override string ToString()
-    {
-        return Name[4..];
-    }
-
-    public override bool Equals(object? obj)
-    {
-        if (obj == null) return false;
-
-        return Index == ((Modifiers)obj).Index;
-    }
-
-    public override int GetHashCode()
-    {
-        return Index.GetHashCode();
-    }
-
-    public bool Equals(Modifiers other)
-    {
-        return Index == other.Index && Name == other.Name;
-    }
-
-    public static bool operator ==(Modifiers left, Modifiers right)
-    {
-        return left.Equals(right);
-    }
-
-    public static bool operator !=(Modifiers left, Modifiers right)
-    {
-        return !(left == right);
     }
 }

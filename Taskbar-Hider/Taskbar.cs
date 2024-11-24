@@ -12,6 +12,31 @@ namespace Taskbar_Hider_Avalonia;
 
 internal class Taskbar
 {
+    private const string ClassName = "Shell_TrayWnd";
+    private readonly bool _defaultAutoHide;
+    private readonly DispatcherTimer _timer;
+
+    private HWND _hWnd = HWND.Null;
+
+
+    public Taskbar()
+    {
+        // 检查并保存当前任务栏状态
+        _defaultAutoHide = (GetTaskbarState() & PInvoke.ABS_AUTOHIDE) == PInvoke.ABS_AUTOHIDE;
+        Visibility = PInvoke.IsWindowVisible(HWnd);
+
+        // 设置定时器用于定时保证任务栏的隐藏情况
+        _timer = new DispatcherTimer
+        {
+            Interval = new TimeSpan(0, 0, 0, 0, 1000)
+        };
+        _timer.Tick += (_, _) =>
+        {
+            if (PInvoke.IsWindowVisible(HWnd) == Visibility) Show(Visibility);
+        };
+        _timer.Start();
+    }
+
     public bool Visibility { get; set; }
 
     private HWND HWnd
@@ -31,30 +56,6 @@ internal class Taskbar
 
             return _hWnd;
         }
-    }
-
-    private HWND _hWnd = HWND.Null;
-    private readonly bool _defaultAutoHide;
-    private readonly DispatcherTimer _timer;
-    private const string ClassName = "Shell_TrayWnd";
-
-
-    public Taskbar()
-    {
-        // 检查并保存当前任务栏状态
-        _defaultAutoHide = (GetTaskbarState() & PInvoke.ABS_AUTOHIDE) == PInvoke.ABS_AUTOHIDE;
-        Visibility = PInvoke.IsWindowVisible(HWnd);
-
-        // 设置定时器用于定时保证任务栏的隐藏情况
-        _timer = new DispatcherTimer
-        {
-            Interval = new TimeSpan(0, 0, 0, 0, 1000)
-        };
-        _timer.Tick += (_, _) =>
-        {
-            if (PInvoke.IsWindowVisible(HWnd) == Visibility) Show(Visibility);
-        };
-        _timer.Start();
     }
 
     public void ChangeState()
