@@ -23,7 +23,7 @@ internal class Taskbar
     {
         // 检查并保存当前任务栏状态
         _defaultAutoHide = (GetTaskbarState() & PInvoke.ABS_AUTOHIDE) == PInvoke.ABS_AUTOHIDE;
-        Visibility = PInvoke.IsWindowVisible(HWnd);
+        Visibility = AppConfiguration.Instance.Config.LastStateVisibility;
 
         // 设置定时器用于定时保证任务栏的隐藏情况
         _timer = new DispatcherTimer
@@ -32,12 +32,12 @@ internal class Taskbar
         };
         _timer.Tick += (_, _) =>
         {
-            if (PInvoke.IsWindowVisible(HWnd) == Visibility) Show(Visibility);
+            if (PInvoke.IsWindowVisible(HWnd) != Visibility) Show(Visibility);
         };
         _timer.Start();
     }
 
-    public bool Visibility { get; set; }
+    private bool Visibility { get; set; }
 
     private HWND HWnd
     {
@@ -67,7 +67,8 @@ internal class Taskbar
         Thread.Sleep(80);
         Show(Visibility);
 
-        AppConfiguration.Instance.Config.ShowTaskbarOnStartup = Visibility;
+        AppConfiguration.Instance.Config.LastStateVisibility = Visibility;
+        AppConfiguration.Instance.Save();
     }
 
     private void Show(bool show)

@@ -14,7 +14,7 @@ internal struct Configuration
 
     public uint Modifiers { get; set; } = (uint)HOT_KEY_MODIFIERS.MOD_ALT;
     public uint VKey { get; set; } = (uint)VIRTUAL_KEY.VK_F2;
-    public bool ShowTaskbarOnStartup { get; set; } = true;
+    public bool LastStateVisibility { get; set; } = true;
 }
 
 [JsonSerializable(typeof(Configuration))]
@@ -24,7 +24,7 @@ internal partial class ConfigurationContext : JsonSerializerContext;
 internal class AppConfiguration
 {
     private static readonly string ConfigPath =
-        Path.GetDirectoryName(Environment.ProcessPath) + @"/" + App.ProgramName + ".json";
+        Path.GetDirectoryName(Environment.ProcessPath) + "/" + App.ProgramName + ".json";
 
     public Configuration Config = new();
 
@@ -33,6 +33,11 @@ internal class AppConfiguration
         if (!File.Exists(ConfigPath)) return;
         Config = JsonSerializer.Deserialize(
             File.ReadAllText(ConfigPath), ConfigurationContext.Default.Configuration);
+    }
+
+    ~AppConfiguration()
+    {
+        Save();
     }
 
     public static AppConfiguration Instance { get; } = new();

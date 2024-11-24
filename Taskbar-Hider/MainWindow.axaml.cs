@@ -30,10 +30,7 @@ public partial class MainWindow : Window
             _showFirstTime = false;
         };
         _hWnd = new HWND((IntPtr)TryGetPlatformHandle()?.Handle!);
-        _tb = new Taskbar
-        {
-            Visibility = AppConfiguration.Instance.Config.ShowTaskbarOnStartup
-        };
+        _tb = new Taskbar();
         _hk = new HotKeys();
         Win32Properties.AddWndProcHookCallback(this, _hk.OnHotkey);
         _autorun = new AutoRun(App.ProgramName);
