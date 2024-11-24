@@ -17,22 +17,20 @@ public partial class MainWindow : Window
     private readonly ImmutableList<Modifiers> _modifiers;
     private readonly ImmutableList<Keys> _vKeys;
 
-    private readonly HWND _hWnd; // MainWindow句柄
+    private readonly HWND _hWnd; // MainWindow句柄 不为HWND.Null
 
     private bool _showFirstTime = true;
 
     public MainWindow()
     {
+        InitializeComponent();
         Opened += (_, _) =>
         {
-            if (_showFirstTime)
-            {
-                Hide(); // 这会导致设计器中窗口隐藏
-                _showFirstTime = false;
-            }
+            if (!_showFirstTime) return;
+            Hide(); // 这会导致设计器中窗口隐藏
+            _showFirstTime = false;
         };
-        InitializeComponent();
-        _hWnd = new HWND(TryGetPlatformHandle()?.Handle ?? IntPtr.Zero);
+        _hWnd = new HWND((IntPtr)TryGetPlatformHandle()?.Handle!);
         _tb = new Taskbar
         {
             Visibility = AppConfiguration.Instance.Config.ShowTaskbarOnStartup
@@ -40,8 +38,7 @@ public partial class MainWindow : Window
         _hk = new HotKeys();
         Win32Properties.AddWndProcHookCallback(this, _hk.OnHotkey);
         _autorun = new AutoRun(App.ProgramName);
-
-        AutoRunCheckBox.IsChecked = _autorun.RunOnBoot;
+        AutoRunToggleSwitch.IsChecked = _autorun.RunOnBoot;
 
         _vKeys = Enum.GetValues<VIRTUAL_KEY>()
             .Select(m => new Keys() { Index = (int)m, Name = Enum.GetName(m)! })
@@ -62,14 +59,9 @@ public partial class MainWindow : Window
         _hk.Unregister(_hWnd, _tb.ChangeState);
     }
 
-    private void ResetButton_OnClick(object? sender, RoutedEventArgs e)
+    private void AutoRunToggleSwitch_OnClick(object? sender, RoutedEventArgs e)
     {
-        _tb.ResetHandle();
-    }
-
-    private void AutoRunCheckBox_OnClick(object? sender, RoutedEventArgs e)
-    {
-        var cb = (CheckBox)sender!;
+        var cb = (ToggleSwitch)sender!;
         _autorun.SetStartupOnBoot(cb.IsChecked!.Value);
     }
 
@@ -82,7 +74,6 @@ public partial class MainWindow : Window
         AppConfiguration.Instance.Config.Modifiers = (uint)_modifiers[cb.SelectedIndex].Index;
         AppConfiguration.Instance.Save();
 
-        if (_hWnd == HWND.Null) return;
         // 取消注册热键
         _hk.Unregister(_hWnd, _tb.ChangeState);
         // 注册热键
@@ -100,15 +91,12 @@ public partial class MainWindow : Window
         AppConfiguration.Instance.Config.VKey = (uint)_vKeys[cb.SelectedIndex].Index;
         AppConfiguration.Instance.Save();
 
-        if (_hWnd != HWND.Null)
-        {
-            // 取消注册热键
-            _hk.Unregister(_hWnd, _tb.ChangeState);
-            // 注册热键
-            _hk.Register(_hWnd, (HOT_KEY_MODIFIERS)AppConfiguration.Instance.Config.Modifiers,
-                (VIRTUAL_KEY)AppConfiguration.Instance.Config.VKey,
-                _tb.ChangeState);
-        }
+        // 取消注册热键
+        _hk.Unregister(_hWnd, _tb.ChangeState);
+        // 注册热键
+        _hk.Register(_hWnd, (HOT_KEY_MODIFIERS)AppConfiguration.Instance.Config.Modifiers,
+            (VIRTUAL_KEY)AppConfiguration.Instance.Config.VKey,
+            _tb.ChangeState);
     }
 }
 

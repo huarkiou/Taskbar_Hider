@@ -14,15 +14,33 @@ internal class Taskbar
 {
     public bool Visibility { get; set; }
 
+    private HWND HWnd
+    {
+        get
+        {
+            if (_hWnd != HWND.Null && PInvoke.IsWindow(_hWnd)) return _hWnd;
+            _hWnd = PInvoke.FindWindow(ClassName, null);
+            if (_hWnd != HWND.Null) return _hWnd;
+            Stopwatch sw = new();
+            sw.Start();
+            while (_hWnd == HWND.Null)
+            {
+                _hWnd = PInvoke.FindWindow(ClassName, null);
+                if (sw.Elapsed > new TimeSpan(0, 0, 5)) throw new Exception("找不到任务栏句柄");
+            }
+
+            return _hWnd;
+        }
+    }
+
+    private HWND _hWnd = HWND.Null;
     private readonly bool _defaultAutoHide;
     private readonly DispatcherTimer _timer;
-    private HWND HWnd { get; set; }
     private const string ClassName = "Shell_TrayWnd";
+
 
     public Taskbar()
     {
-        ResetHandle();
-
         // 检查并保存当前任务栏状态
         _defaultAutoHide = (GetTaskbarState() & PInvoke.ABS_AUTOHIDE) == PInvoke.ABS_AUTOHIDE;
         Visibility = PInvoke.IsWindowVisible(HWnd);
@@ -39,19 +57,6 @@ internal class Taskbar
         _timer.Start();
     }
 
-    public void ResetHandle()
-    {
-        HWnd = PInvoke.FindWindow(ClassName, null);
-        if (HWnd != HWND.Null) return;
-        Stopwatch sw = new();
-        sw.Start();
-        while (HWnd == HWND.Null)
-        {
-            HWnd = PInvoke.FindWindow(ClassName, null);
-            if (sw.Elapsed > new TimeSpan(0, 0, 5)) throw new Exception("找不到任务栏句柄");
-        }
-    }
-
     public void ChangeState()
     {
         Visibility = !Visibility;
@@ -66,11 +71,6 @@ internal class Taskbar
 
     private void Show(bool show)
     {
-        if (!PInvoke.IsWindow(HWnd))
-        {
-            ResetHandle();
-        }
-
         PInvoke.ShowWindow(HWnd,
             show
                 ? SHOW_WINDOW_CMD.SW_SHOW
