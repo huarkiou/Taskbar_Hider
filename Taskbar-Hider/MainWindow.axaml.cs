@@ -29,7 +29,7 @@ public partial class MainWindow : Window
             Hide(); // 这会导致设计器中窗口隐藏
             _showFirstTime = false;
         };
-        _hWnd = new HWND((IntPtr)TryGetPlatformHandle()?.Handle!);
+        _hWnd = new HWND((nint)TryGetPlatformHandle()?.Handle!);
         _tb = new Taskbar();
         _hk = new HotKeys();
         Win32Properties.AddWndProcHookCallback(this, _hk.OnHotkey);
@@ -67,12 +67,7 @@ public partial class MainWindow : Window
             .Select(v => v.Key).ToArray().First();
         AppConfiguration.Instance.Save();
 
-        // 取消注册热键
-        _hk.Unregister(_hWnd, _tb.ChangeState);
-        // 注册热键
-        _hk.Register(_hWnd, (HOT_KEY_MODIFIERS)AppConfiguration.Instance.Config.Modifiers,
-            (VIRTUAL_KEY)AppConfiguration.Instance.Config.VKey,
-            _tb.ChangeState);
+        ChangeHotkey();
     }
 
     private void VirtualKeyComboBox_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -83,11 +78,23 @@ public partial class MainWindow : Window
             .Select(v => v.Key).ToArray().First();
         AppConfiguration.Instance.Save();
 
+        ChangeHotkey();
+    }
+
+    private void ChangeHotkey()
+    {
         // 取消注册热键
         _hk.Unregister(_hWnd, _tb.ChangeState);
         // 注册热键
-        _hk.Register(_hWnd, (HOT_KEY_MODIFIERS)AppConfiguration.Instance.Config.Modifiers,
-            (VIRTUAL_KEY)AppConfiguration.Instance.Config.VKey,
-            _tb.ChangeState);
+        try
+        {
+            _hk.Register(_hWnd, (HOT_KEY_MODIFIERS)AppConfiguration.Instance.Config.Modifiers,
+                (VIRTUAL_KEY)AppConfiguration.Instance.Config.VKey,
+                _tb.ChangeState);
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine(exception);
+        }
     }
 }

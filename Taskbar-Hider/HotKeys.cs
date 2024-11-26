@@ -11,7 +11,7 @@ public class HotKeys
 {
     public delegate void HotKeyCallBackHandler();
 
-    private readonly Dictionary<int, HotKeyCallBackHandler> _keymap = new();
+    private readonly Dictionary<int, HotKeyCallBackHandler> _globalAtomMap = new();
 
     /// <summary>
     ///     注册快捷键
@@ -25,8 +25,8 @@ public class HotKeys
     {
         int id = PInvoke.GlobalAddAtom("Taskbar-Hider");
         if (!PInvoke.RegisterHotKey(hWnd, id, modifiers, (uint)vk))
-            throw new Exception("注册失败！");
-        _keymap[id] = callBack;
+            throw new Exception("注册失败：可能是快捷键冲突了");
+        _globalAtomMap[id] = callBack;
     }
 
     /// <summary>
@@ -36,10 +36,10 @@ public class HotKeys
     /// <param name="callBack">回调函数</param>
     internal void Unregister(HWND hWnd, HotKeyCallBackHandler callBack)
     {
-        foreach (var (key, _) in _keymap.Where(pair => pair.Value == callBack))
+        foreach (var (id, _) in _globalAtomMap.Where(pair => pair.Value == callBack))
         {
-            PInvoke.UnregisterHotKey(hWnd, key);
-            PInvoke.GlobalDeleteAtom((ushort)key);
+            PInvoke.UnregisterHotKey(hWnd, id);
+            PInvoke.GlobalDeleteAtom((ushort)id);
         }
     }
 
@@ -52,17 +52,17 @@ public class HotKeys
     /// <param name="longParam">附加参数2</param>
     /// <param name="handled">是否处理</param>
     /// <returns>返回句柄</returns>
-    public IntPtr OnHotkey(IntPtr hWnd, uint msg, IntPtr wideParam, IntPtr longParam, ref bool handled)
+    public nint OnHotkey(nint hWnd, uint msg, nint wideParam, nint longParam, ref bool handled)
     {
         switch (msg)
         {
             case (int)PInvoke.WM_HOTKEY:
                 var id = wideParam.ToInt32();
-                if (_keymap.TryGetValue(id, out var callback))
+                if (_globalAtomMap.TryGetValue(id, out var callback))
                     callback();
                 break;
         }
 
-        return IntPtr.Zero;
+        return nint.Zero;
     }
 }
