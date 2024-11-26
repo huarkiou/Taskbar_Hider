@@ -8,7 +8,7 @@ using Windows.Win32.UI.Shell;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Avalonia.Threading;
 
-namespace Taskbar_Hider_Avalonia;
+namespace Taskbar_Hider;
 
 internal class Taskbar
 {

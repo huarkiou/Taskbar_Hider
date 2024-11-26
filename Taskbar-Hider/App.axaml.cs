@@ -5,7 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 
-namespace Taskbar_Hider_Avalonia;
+namespace Taskbar_Hider;
 
 public class App : Application
 {

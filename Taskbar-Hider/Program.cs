@@ -1,7 +1,7 @@
 ﻿using System;
 using Avalonia;
 
-namespace Taskbar_Hider_Avalonia;
+namespace Taskbar_Hider;
 
 internal static class Program
 {

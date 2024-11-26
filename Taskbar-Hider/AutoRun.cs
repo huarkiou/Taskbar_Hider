@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Win32;
 
-namespace Taskbar_Hider_Avalonia;
+namespace Taskbar_Hider;
 
 internal class AutoRun
 {

@@ -6,7 +6,7 @@ using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 
-namespace Taskbar_Hider_Avalonia;
+namespace Taskbar_Hider;
 
 public partial class MainWindow : Window
 {

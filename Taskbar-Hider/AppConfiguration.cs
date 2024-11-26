@@ -4,7 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
-namespace Taskbar_Hider_Avalonia;
+namespace Taskbar_Hider;
 
 internal struct Configuration
 {
