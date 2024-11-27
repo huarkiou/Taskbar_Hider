@@ -96,6 +96,7 @@ public partial class MainWindow : Window
         catch (Exception exception)
         {
             Console.WriteLine(exception);
+            Show();
             if (IsVisible)
                 new MessageBox(exception.ToString()).ShowDialog(this);
         }
