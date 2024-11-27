@@ -46,6 +46,7 @@ public partial class MainWindow : Window
             .ToImmutableSortedDictionary(m => (uint)m, m => Enum.GetName(m)![4..]);
         ModifierComboBox.ItemsSource = _modifiers.Values;
         ModifierComboBox.SelectedValue = _modifiers[AppConfiguration.Instance.Config.Modifiers];
+        Loaded += (s, e) => ChangeHotkey();
     }
 
     ~MainWindow()
@@ -95,6 +96,8 @@ public partial class MainWindow : Window
         catch (Exception exception)
         {
             Console.WriteLine(exception);
+            if (IsVisible)
+                new MessageBox(exception.ToString()).ShowDialog(this);
         }
     }
 }
