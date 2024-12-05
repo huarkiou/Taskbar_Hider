@@ -31,11 +31,9 @@
                VerticalAlignment="Center" HorizontalAlignment="Left"
                HorizontalContentAlignment="Left" />
 
-        <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4"
-                VerticalAlignment="Center" HorizontalAlignment="Left">
-            <TextBlock x:Name="MessageTextBlock" TextAlignment="Center" Text="Ok"
-                       VerticalAlignment="Center" HorizontalAlignment="Left" />
-        </Border>
+        <TextBlock x:Name="MessageTextBlock" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4"
+                   TextAlignment="Center"
+                   VerticalAlignment="Center" HorizontalAlignment="Left" />
         <ToggleSwitch x:Name="AutoRunToggleSwitch" Grid.Row="1" Grid.Column="4"
                       Content="开机自启动"
                       Cursor="Hand"
