@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using Avalonia;
 
 namespace Taskbar_Hider;
@@ -11,6 +12,7 @@ internal static class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        Console.OutputEncoding = Encoding.UTF8;
         BuildAvaloniaApp()
             .StartWithClassicDesktopLifetime(args);
     }

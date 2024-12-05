@@ -29,6 +29,12 @@ public partial class MainWindow : Window
             Hide(); // 这会导致设计器中窗口隐藏
             _showFirstTime = false;
         };
+        Loaded += (_, _) => ChangeHotkey();
+        Closing += (sender, eventArgs) =>
+        {
+            ((Window)sender!).Hide();
+            eventArgs.Cancel = true;
+        };
         _hWnd = new HWND((nint)TryGetPlatformHandle()?.Handle!);
         _tb = new Taskbar();
         _hk = new HotKeys();
@@ -46,7 +52,6 @@ public partial class MainWindow : Window
             .ToImmutableSortedDictionary(m => (uint)m, m => Enum.GetName(m)![4..]);
         ModifierComboBox.ItemsSource = _modifiers.Values;
         ModifierComboBox.SelectedValue = _modifiers[AppConfiguration.Instance.Config.Modifiers];
-        Loaded += (s, e) => ChangeHotkey();
     }
 
     ~MainWindow()
@@ -98,7 +103,7 @@ public partial class MainWindow : Window
             Console.WriteLine(exception);
             Show();
             if (IsVisible)
-                new MessageBox(exception.ToString()).ShowDialog(this);
+                new MessageBox(exception.Message).ShowDialog(this);
         }
     }
 }

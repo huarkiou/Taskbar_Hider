@@ -24,11 +24,6 @@ public class App : Application
         mutex.ReleaseMutex();
         desktop.ShutdownMode = ShutdownMode.OnLastWindowClose;
         desktop.MainWindow = new MainWindow();
-        desktop.MainWindow.Closing += (sender, eventArgs) =>
-        {
-            ((Window)sender!).Hide();
-            eventArgs.Cancel = true;
-        };
 
         base.OnFrameworkInitializationCompleted();
     }
