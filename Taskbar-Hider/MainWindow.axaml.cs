@@ -97,10 +97,12 @@ public partial class MainWindow : Window
             _hk.Register(_hWnd, (HOT_KEY_MODIFIERS)AppConfiguration.Instance.Config.Modifiers,
                 (VIRTUAL_KEY)AppConfiguration.Instance.Config.VKey,
                 _tb.ChangeState);
+            MessageTextBlock.Text = "状态正常";
         }
         catch (Exception exception)
         {
             Console.WriteLine(exception);
+            MessageTextBlock.Text = exception.Message;
             Show();
             if (IsVisible)
                 new MessageBox(exception.Message).ShowDialog(this);

@@ -25,7 +25,7 @@ public class HotKeys
     {
         int id = PInvoke.GlobalAddAtom("Taskbar-Hider");
         if (!PInvoke.RegisterHotKey(hWnd, id, modifiers, (uint)vk))
-            throw new Exception("注册失败：可能是快捷键冲突了");
+            throw new Exception("全局快捷键注册失败：快捷键冲突!");
         _globalAtomMap[id] = callBack;
     }
 

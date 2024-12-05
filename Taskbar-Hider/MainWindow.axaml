@@ -31,7 +31,14 @@
                VerticalAlignment="Center" HorizontalAlignment="Left"
                HorizontalContentAlignment="Left" />
 
-        <ToggleSwitch x:Name="AutoRunToggleSwitch" Grid.Row="1" Grid.Column="3" Content="开机自启动" Cursor="Hand"
+        <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4"
+                VerticalAlignment="Center" HorizontalAlignment="Left">
+            <TextBlock x:Name="MessageTextBlock" TextAlignment="Center" Text="Ok"
+                       VerticalAlignment="Center" HorizontalAlignment="Left" />
+        </Border>
+        <ToggleSwitch x:Name="AutoRunToggleSwitch" Grid.Row="1" Grid.Column="4"
+                      Content="开机自启动"
+                      Cursor="Hand"
                       VerticalAlignment="Center" HorizontalAlignment="Center"
                       Click="AutoRunToggleSwitch_OnClick" />
     </Grid>
