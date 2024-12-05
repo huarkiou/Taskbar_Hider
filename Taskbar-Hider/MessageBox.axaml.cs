@@ -11,6 +11,10 @@ public partial class MessageBox : Window
         MessageLabel.Content = msg;
     }
 
+    public MessageBox() : this("Default Message.")
+    {
+    }
+
     private void OkButton_OnClick(object? sender, RoutedEventArgs e)
     {
         Close();
